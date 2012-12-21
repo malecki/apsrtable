@@ -1,3 +1,0 @@
-export(apsrtable)
-exportPattern(".*")
-import(lme4)
