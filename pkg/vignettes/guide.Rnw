@@ -1,0 +1,4 @@
+%\VignetteIndexEntry{Using and Extending apsrtable}
+
+%% This is a placeholder file. Please see
+%% guide.Rnw.real

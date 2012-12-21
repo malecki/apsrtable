@@ -1,0 +1,496 @@
+\documentclass[10pt,xetex,xcolor=pdftex,dvipsnames,table,t]{beamer}
+\usepackage[no-math]{fontspec}
+%%%% OVERLAY for uncovers
+% \begin{itemize}[<+->]
+% \begin{itemize}[<+-| alert@+>]
+
+\usetheme[compress]{Singapore}
+\usecolortheme[named=OliveGreen]{structure}
+\usefonttheme{professionalfonts}
+%\usepackage{arev}
+%\usepackage[slides,textosf,mathlf,amsbb,minionint,footnotefigures]{MinionPro}
+
+%\usepackage{ucs}
+%\usepackage{xltxtra}
+
+\defaultfontfeatures{Mapping=tex-text}
+\setsansfont[BoldFont={Fontin Sans Bold}]{Fontin Sans Regular}
+
+\setbeamerfont{frametitle}{family={\fontsize{14}{12}\fontspec{Museo 700}} }
+\setbeamercolor{frametitle}{fg=MidnightBlue}
+\setbeamerfont{item}{family={\fontspec{Museo 300}}}
+\setbeamercolor{item}{fg=MidnightBlue}
+\setbeamerfont{title}{family={\fontspec{Museo}}}
+\setbeamerfont{title}{family={\fontspec{Azuro-Bold}}}
+\setbeamerfont{minionreg}{family*={MinionPro-OsF}}
+\setbeamerfont{abstract}{family*={MinionPro-OsF}}
+%\setbeamerfont{caption}{family={\fontspec{PrioriSanBoldSC}}}
+\setbeamercolor{caption}{fg=MidnightBlue}
+\setbeamertemplate{caption}{\insertcaption}
+\setmonofont[Scale=0.9]{Azuro}  
+
+\usepackage{dcolumn}
+\usepackage[english]{babel}
+%\usepackage{pgf,pgfnodes,pgfautomata,pgfheaps}
+%\usepackage{amsmath,amssymb}
+%\usepackage[latin1]{inputenc}
+\setbeamercovered{dynamic}
+
+\usepackage{Sweave}
+%%%%%%%%%%%%%%% Useful Sweave arguments!  %%%%%%%%%%%%%%%%%
+%%% echo=FALSE fig=TRUE results=hide eps=FALSE include=FALSE
+%%% eval=FALSE  
+%%% results=tex for tables (can also be used inline, see below)
+%%% \setkeys{Gin}{width=,height=} sizes the latex includegraphics
+%%%   while the codechunk args set the grdev size.
+%%% For lattice figures, trellis.par.set DOES NOT WORK 
+%%%   Instead, use par.settings=list() in the high-level call
+%%%   which can include eg grid.pars=list(fontfamily="Times") 
+
+
+\title{MRP Package Vignette}
+\author{Michael Malecki}
+\date{\today}
+\begin{document}
+
+\begin{frame}
+  \titlepage{}
+\end{frame}
+%%% Preserve comments and spacing of echo'd R
+%%% (ESS is better than R at indenting!)
+\SweaveOpts{keep.source=TRUE}
+%%% Place whatever libraries you want in mainsetup 
+<<mainsetup,echo=false,results=hide>>=
+library(xtable)
+library(MRP)
+library(apsrtable)
+options(width=100,prompt="R> ",continue="   ")
+load("/Users/malecki/mrp/malecki/fitted.Rdata")
+@ 
+
+\section{Running Example}
+\label{sec:running-example}
+
+\raggedright
+
+\begin{frame}
+  \frametitle{MRP Primer}
+  The running example is the same combined poll data and model in
+  Kastellec's
+  \href{http://www.princeton.edu/~jkastell/mrp_primer.html}{MRP
+    Primer}, dealing with support for same-sex marriage in 2004--2005.
+\end{frame}
+\subsection{Data}
+\label{sec:data}
+
+\begin{frame}
+  \frametitle{Data}
+  \begin{itemize}
+  \item combined survey results in the “marriage.data” data.frame
+  \item state-level predictors in “Statelevel” data.frame.
+  \item Both loaded by \texttt{data(samesexmarriage)}.
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Other Data}
+\begin{description}
+\item[mrp.census] Census data with main data columns `weighted2000',
+  `weighted2004', and `weighted2008'. See documentation for
+  \texttt{mrp.census} for details on the demographic features in the
+  file.
+\item[mrp.regions] A data.frame with state two-letter abbreviations
+  and five census region codes, with DC as its own region.
+\item[spmap.states] A projected map object with state names,
+  fips codes, and two-letter state abbreviations.
+
+<<load-data,echo=TRUE>>=
+data(samesexmarriage)
+data(mrp.census)
+data(mrp.regions)
+data(spmap.states)
+@ 
+\end{description}
+\end{frame}
+
+
+\section{Fitting a basic model}
+\label{sec:fitting-basic-model}
+
+\subsection{Preparing the data}
+\label{sec:preparing-data}
+
+\begin{frame}
+  \frametitle{preparing data}
+  \begin{itemize}
+  \item Relies heavily on R's “factor” data type
+  \item Factors have
+    associated “levels” (names for categories) and may be ordered.
+  \item categorical variables need to be factors
+  \item levels need
+    to match between the survey and poststratification
+    (census) data
+  \end{itemize}
+\end{frame}
+\begin{frame}[containsverbatim]
+  \footnotesize
+  \frametitle{Preparing Data}
+<<prepare-data>>=
+marriage.data <- within(marriage.data, {
+    state <- factor(state,exclude=NA)
+    poll <- factor(poll,exclude=NA)
+    age <- factor(age.cat,exclude=NA,
+                  labels=c("18-29","30-44","45-64","65+"))
+    edu <- factor(edu.cat,exclude=NA,labels=c("< High School",
+                                       "High School",
+                                       "Some College",
+                                       "Graduated College"))
+    ## Code interaction here, first fixing levels
+    female <- factor(female,levels=c(0,1),
+                     labels=c("Male","Female"))
+    race.wbh <- factor(race.wbh)
+    levels(race.wbh) <- c("White","Black","Hispanic")
+    f.race <- interaction(female,race.wbh)
+  })
+  ## Remove empty "" state and drop it from levels.
+  marriage.data <- subset(marriage.data,!is.na(state) & state!="" )
+  marriage.data$state <- factor(marriage.data$state)
+@ 
+\end{frame}
+\begin{frame}[containsverbatim]
+  \frametitle{Prepare Poststratification Array}
+  \begin{itemize}
+  \item<1-> Poll data uses four instead of five
+    categories for education --- combine the top 2 levels of
+    census education into 1 “Graduated College” level.
+  \item<1-> Drop any
+    states from the census that are not in the survey dataset
+  \end{itemize}
+<<prepare-census>>=
+mrp.census <- na.omit(mrp.census[mrp.census$state 
+                                 %in% marriage.data$state,])
+
+  mrp.census <- within(mrp.census,{
+    age <- factor(age,exclude=NA,labels=c("18-29","30-44",
+                                   "45-64","65+"))
+    education[education=="postgraduate"] <- "college graduate"
+    edu <- factor(education,exclude=NA,labels=c("< High School",
+                                         "High School", "Some College",
+                                         "Graduated College"))
+    state <- factor(state,exclude=NA)
+    race[race=="Other"] <- NA
+    race <- factor(race,exclude=NA)
+    f.race <- interaction(sex,race)
+  })
+  mrp.census <- na.omit(mrp.census)
+@ 
+\end{frame}
+\subsection{Calling \texttt{mrp()} for the first time}
+\label{sec:calling-mrp-first}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Calling mrp() for the first time}
+  \begin{description}
+  \item[factors] checked to match between data and census
+  \item[1-ways] automatically inserted as \texttt{(1 | G)}
+  \item[2-ways] \emph{for now} user must create
+  \item[weights] expanded into effective ($N^y,N^n$)
+  \item 
+    
+<<simple-model,echo=TRUE,results=hide>>=
+mrp.simple <- mrp(yes.of.all ~ state+age+edu, 
+                  poll=marriage.data,
+                  population=mrp.census,
+                  cov.prior="none",
+                  use="weighted2004")
+@ 
+\end{description}
+\end{frame}
+
+\begin{frame}
+  \frametitle{What mrp() does}
+  \begin{enumerate}
+  \item Cross-classify by main formula creates N-way array,
+    computes the $\bar{Y}$, $N_{\mathrm{eff}}$ taking into account
+    any survey weights provided, and “design effect” in that cell.
+  \item Collapse N-way survey array into a rectangular matrix,
+    using $\bar{Y}$, effective $N$, and the design effects to form for
+    each combination of strata (`cell' of the N-way data) a sum of
+    yes and no responses.
+  \item Perform any transformations on the prepared data with the `add'
+    argument 
+  \item Stratify the population data, creating an N-way array of
+    matching dimension to that of the survey.
+  \item Estimate a multilevel model. By default this is a call to
+    \texttt{glmer} with \texttt{family= quasibinomial(
+      link="logit")}. By default, as in the call above, the formula
+    for this model fits just an intercept for each stratum in the
+    specification.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{poststratify()}
+  Poststratification is straightforward: multiply the fitted values from the multilevel model by the population frequencies, and collapse across any remaining dimensions.
+
+<<simple-model-table-code,eval=FALSE>>=
+xtable(100*poststratify(mrp.simple, ~ edu+age), digits=0)
+@ 
+\begin{table}
+  \centering
+  \caption{Support for same-sex marriage (in percent) by level of education and age cohort. Simple model poststratified results.}
+  \label{tab:table-simplemodel}
+<<simple-model-table,results=tex,echo=FALSE>>=
+ print(xtable(100*poststratify(mrp.simple, ~ edu+age), digits=0),floating=FALSE)
+@ 
+\end{table}
+\end{frame}
+
+\subsection{Basic Map Plotting}
+\label{sec:basic-map-plotting}
+\begin{frame}
+  \frametitle{Basic map plotting}
+  \begin{itemize}
+  \item \emph{MRP} \texttt{spplot} method preserves the same formula
+    interface
+  \item Extends the \texttt{spplot} method, which uses Lattice as the
+    “high level” graphics language
+  \item Future versions hopefully
+    \href{http://spatialanalysis.co.uk/2010/09/27/maps-with-ggplot2/}{\emph{ggplot2}
+      maps}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \begin{figure}
+    \centering
+    \caption{Support for same-sex marraige from simple MRP model.}
+    \label{fig:firstmap}
+<<firstmap,eval=TRUE,fig=TRUE,pdf=FALSE,png=TRUE,eps=FALSE,width=8,height=4,resolution=144>>=
+    print(spplot(mrp.simple, state~state)) 
+@
+  \end{figure}
+\end{frame}
+\section{The Full Model}
+
+\subsection{}
+\label{sec:full-model}
+
+\begin{frame}
+  \frametitle{Full Model}
+  The full model includes
+  \begin{description}
+  \item[poll] \texttt{(1|poll)} (the data combine several polls)
+  \item[region] (states are grouped into regions)
+  \item[state-level predictors] religious attendance and democratic
+    vote share in previous elections
+  \item[interactions] between the cross-classifying strata.
+  \end{description}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{population.formula}
+  We would like to separate the estimation data by poll, but in
+  general the population data will be the same across polls. To remove
+  a stratification dimension, subtract it from the initial formula by
+  adding this argument:
+<<eval=FALSE>>= population.formula= . ~ . - poll 
+@
+
+  If population arrays differ across polls, such as
+  polls over time with contemporaneous census values, duplicate the census data across all polls
+  for which it is the same and creating a factor of name and levels
+  corresponding to those of \texttt{poll}.
+\end{frame}
+
+
+
+\begin{frame}[containsverbatim]
+  \frametitle{Joining \& Transforming}
+  the \texttt{add} argument is a powerful way to add predictors by
+  left-joining (“merging”) other data.frames onto the prepared
+  flattened cross-classified data. 
+  
+  Join on matching keys in same-named columns. The
+  \texttt{Statelevel} data.frame has a column `state' with factor
+  levels matching those in the prepared data.
+
+  \begin{description}
+  \item[z.foo] make a continuous group-level predictor out of a categorical one by rescaling it (2sd)
+  \item[interactions] for now user makes new categorical predictors (should move to default, but want to check for matching names)
+  \item[add=list()] Both types of additional data are provided in a \texttt{list}:
+  \item 
+<<eval=FALSE>>=
+add=list(
+  Statelevel,
+  Regions,
+  expression(z.age <- rescale(age)),
+  expression(age.edu <- interaction(age,edu)))
+@ 
+  \end{description}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{mr.formula}
+  \begin{itemize}
+  \item By default, \emph{MRP} will build a simple model for only intercepts by each stratum indicated in the main formula.
+  \item Want to include all of those, but also the state-level predictors and possibly varying slopes in some of them as well.
+  \item use the dot to indicate what has already been included.
+  \item 
+<<eval=FALSE>>=
+mr.formula= .~.+ (1|region) + (1|age.edu) + z.age + p.relig.full + p.kerry.full
+@ 
+\item The same updating of the formula is used to re-run or extend an existing analysis and modify its formula using the \texttt{mr()} method.
+\end{itemize}
+\end{frame}
+\begin{frame}[containsverbatim]
+  \frametitle{Full model mrp() call}
+<<fullmodelcall,eval=FALSE>>=
+mrp.statelevel <- mrp(yes.of.all~
+                      state+f.race+age+edu+poll,
+                      poll=marriage.data,
+                      population=mrp.census,use="weighted2008",
+                      population.formula=.~.-poll,
+                      add=list(Statelevel,
+                        mrp.regions,
+                        expression(age.edu <- interaction(age,edu)),
+                        expression(z.age <- rescale(age))),
+                      mr.formula=.~.+(1|region)+ (1|age.edu)+
+                       z.age+p.relig.full+p.kerry.full
+                      )
+@ 
+\end{frame}
+
+\section{spplot}
+\subsection{}
+
+\begin{frame}
+  \frametitle{spplot}
+  \begin{itemize}
+  \item \texttt{spplot,mrp-method} uses all parts of the fitted
+    \texttt{mrp} object
+  \item familiar fomula interface
+  \item intelligent
+    subsetting
+  \item easy customization
+  \item addition of other
+    information to the plot by selectively modifying the stroke on a
+    list of features.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Implementation}
+  The \texttt{spplot} method takes an \texttt{mrp} object and a
+  stratification specification, and merges it onto a map from the
+  SpatialPolygonsDataFrame class, provided by the \emph{sp}
+  package. Using \emph{maptools}, users can read in their own ESRI
+  “shapefiles” (actually a collection of files, in either a folder or
+  a zip archive). Shapefiles are somewhat of a standard for GIS
+  applications. As mentioned in the data section above, we have
+  included a map read into R from a publicly available
+  shapefile. According to Wickham, \emph{sp} maps can be used with
+  \emph{ggplot2} via \texttt{fortify} methods; we plan to make
+  poststratified results more accessible to \emph{ggplot2} methods in
+  the future.
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{subsetting}
+  \begin{description}
+  \item[state ~] In the example, the data
+  has two-letter US state abbreviations in a variable called `state'
+  and the included map has the same data in the variable
+  `\textsc{state}' (the function default).
+\item[age + edu] conditioning variables in the formula form the rows and columns of a
+  faceted “trellis” or “small multiples” display.
+\item[exclude, subset] both suppress plotting of certain geographic
+  units by removing them from the map data; the same effect can be
+  achieved with `subset', except `subset' applies to all vars.
+\item 
+<<subset-exclude,eval=FALSE>>= exclude=c("AK","HI")
+  subset=(age=="18-29") 
+@
+\end{description}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{stroke}
+\begin{itemize}
+\item Several different conditions can be drawn with different stroke
+  attributes \texttt{(`lty', `lwd', and `col')}.
+\item Can be subscript vectors or expressions.
+\item Each element of the list is evaluated in the
+  context of the full two-dimensional cross-classified data (that is,
+  the `data' slot of the \texttt{mrp} object. 
+
+<<strokelist,eval=FALSE>>=
+stroke=list(
+  expression(hasmarriage2010==TRUE),
+  "CA")
+@ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Colors \& Center}
+The \texttt{spplot} methods eventually call \texttt{levelplot} which maps values into colors along a range. These colors are called `regions' in \emph{lattice} parlance and the number and location of cut points between them can be specified explicitly or calculated from the range of the data. It may be desirable to show values as offsets, for example, from a national poststratified average. Recentering the scale provides an easy way to do that with MRP results:
+
+<<recenter,eval=FALSE>>=
+center=poststratify(mrp.statelevel)
+@ 
+\end{frame}
+\begin{frame}
+  \frametitle{The \texttt{add.settings} list}
+\label{sec:add.settings-list}
+
+Much of the flexibility of \emph{lattice} comes from themes or lists of \texttt{trellis.par.settings}. \emph{MRP} includes a theme with some of the values already discussed (the 64-valued range of colors for the regions; the thin-black stroke as the first value of `superpose.line').
+\begin{description}
+\item[add.line] The lines drawn around all the other features that are not selected in the `stroke' list. The default is a 0-width 20\% gray line.
+\item[reference.line] In general reference lines are not drawn on maps (latitude and longitude lines can be drawn but should follow the projection specifications given in the documentation for \texttt{spmap.states}). \texttt{reference.line\$col} is the color used for NA-valued results.
+\end{description}
+\end{frame}
+\begin{frame}
+  \frametitle{The \texttt{add.settings} list}
+\begin{description}
+\item[add.text] Text settings for the labels for conditioning rows and columns, taken from the names of factor levels. Default (\texttt{cex=0.7}). Depending on graphics devices and registered fonts, the `font' and `fontface' can also be specified here.
+\item[layout.\{width|height\}] By default \texttt{spplot,mrp-method} will place left and top strip titles for the entire row and entire column, rather than on each map panel. This is achieved by providing 0s here for every panel in the order drawn except for those lying at the top or left. 
+\end{description}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Final map code}
+<<finalmapcode,eval=FALSE>>=
+print(spplot(mrp.statelevel, state ~ state,
+                   subset=TRUE,
+                   spmap.states, "STATE", exclude=c("AK","DC","HI"),
+                   stroke=list(expression(hasmarriage2010==TRUE),
+                     "CA"),
+                   center=poststratify(mrp.statelevel), cuts=50,
+                   sub=paste("National average:",
+                     format(poststratify(mrp.statelevel),digits=2)),
+                   add.settings=list(
+                     regions=list(col=fBasics:::divPalette(51,"BrBG")),
+                     superpose.line=list(col=c("black","#00000066"),lwd=c(.3,1.3))
+                     ),
+                   colorkey=list(
+                     space="bottom",height=.5,width=.5,
+                     labels=list(at=c(.04,.34,.64),
+                       labels=c("-30%","|","+30%"), cex=.7)
+                     )
+                   ))
+@ 
+\end{frame}
+\begin{frame}[plain]
+  \begin{figure}[b]
+  \centering
+  \label{fig:finalmap}
+\setkeys{Gin}{width=\linewidth}
+\includegraphics{../pkg/inst/doc/MRP-vignette-finalmap-real.png}
+% <<finalmap,eval=TRUE,fig=TRUE,pdf=FALSE,png=TRUE,eps=FALSE,width=6.5,height=6.5,echo=FALSE,resolution=144>>=
+% <<finalmapcode>>
+% @   
+\end{figure}
+\end{frame}
+\end{document}
