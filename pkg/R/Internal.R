@@ -3,7 +3,7 @@
 ## (will be error for s4 objects like 'mer'
 getCustomSE <- function(x) {
     se <- try(x$se)
-    if(inherits(se, "try-error")) {
+    if(is.null(se) || inherits(se, "try-error")) {
         warning("Oops: Custom se display requested but none provided.")
         return(NULL)
     }

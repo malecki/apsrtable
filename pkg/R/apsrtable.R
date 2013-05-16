@@ -385,7 +385,8 @@ model.summaries <- coefPosition(model.summaries, coefnames)
 
 
     model.se.out[var.pos] <- s$coefficients[,2]
-    if( !is.null(getCustomSE(s)) & se %in% c("robust","both") ) {
+    if(!is.null(suppressWarnings(getCustomSE(s))) &
+       se %in% c("robust","both") ) {
         model.se.out[var.pos] <- s$se
     }
 
@@ -396,7 +397,7 @@ model.summaries <- coefPosition(model.summaries, coefnames)
                                          format="f"),
                                  ")",sep=""),
                            "")
-    if(se=="both" && !is.null(getCustomSE(s))){
+    if(se=="both" && !is.null(suppressWarnings(getCustomSE(s)))){
       model.se.out[var.pos] <- ifelse(model.se.out != "",
                              paste(model.se.out," [",
                                    formatC(s$coefficients[,2],
@@ -496,7 +497,7 @@ model.summaries <- coefPosition(model.summaries, coefnames)
   ## Robust is the default, but if only vcov are given,
   ## quietly switch the argument.
   se <- ifelse((se != "vcov" &&
-                sum(unlist(lapply(model.summaries, function(x) !is.null(getCustomSE(x)))) >0 ) ) ,
+                sum(unlist(lapply(model.summaries, function(x) !is.null(suppressWarnings(getCustomSE(x))))) >0 ) ) ,
                "robust","vcov")
   thenotes <- as.list(1:length(notes))
   thenotes[!sapply(notes,is.function)] <- notes[!sapply(notes,is.function)]
