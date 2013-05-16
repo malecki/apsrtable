@@ -292,13 +292,16 @@ apsrtable <- function (...,
       if (inherits(s, "try-error")) {
           s <- summary(x)
       }
-      if(!is.null(customSE(x)) && se != "vcov") {
-          est <- coef(x)
-          if(class(customSE(x)) == "matrix") {
-              x$se <- sqrt(diag(x$se))
+      theSE <- getCustomSE(x)
+      if(!is.null(theSE) && se != "vcov") {
+          ## take first column of summary NOT coef(model)
+          ## this already omits NA 'aliased' coefs
+          est <- coef(s)[, 1]
+          if(class(theSE) == "matrix") {
+              theSE <- sqrt(diag(theSE))
           }
-          s$coefficients[,3] <- tval <- est / customSE(x)
-          e <- try(s$coefficients[,4] <-
+          s$coefficients[, 3] <- tval <- tValue(est, theSE)
+          e <- try(s$coefficients[, 4] <-
                    2 * pt(abs(tval),
                           length(x$residuals) - x$rank,
                           lower.tail=FALSE),silent=TRUE)
@@ -306,11 +309,12 @@ apsrtable <- function (...,
               s$coefficients[, 4] <-
                   2*pnorm(abs(tval),lower.tail=FALSE)
           }
-          s$se <- x$se
+          s$se <- theSE
       }
       if(se == "pval") {
-          s$coefficients[,2] <- s$coefficients[,4]
-
+          ## definitely a hack: just replace the column
+          ## with this one instead.
+          s$coefficients[,2] <- s$coefficients[, 4]
       }
       return(s)
   } )
@@ -362,12 +366,12 @@ model.summaries <- coefPosition(model.summaries, coefnames)
     }
 
 
-  out.table <- lapply(model.summaries, function(x){
-    var.pos <- attr(x,"var.pos")
+  out.table <- lapply(model.summaries, function(s){
+    var.pos <- attr(s,"var.pos")
     model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
-    model.out[var.pos] <- x$coefficients[,1]
+    model.out[var.pos] <- s$coefficients[,1]
     if(lev>0) {
-        star.out[var.pos] <- apsrStars(x$coefficients,
+        star.out[var.pos] <- apsrStars(s$coefficients,
                                        stars=stars,
                                        lev=lev,signif.stars=TRUE)
     } else {
@@ -380,9 +384,9 @@ model.summaries <- coefPosition(model.summaries, coefnames)
 
 
 
-    model.se.out[var.pos] <- x$coefficients[,2]
-    if( !is.null(customSE(x)) & se %in% c("robust","both") ) {
-        model.se.out[var.pos] <- x$se
+    model.se.out[var.pos] <- s$coefficients[,2]
+    if( !is.null(getCustomSE(s)) & se %in% c("robust","both") ) {
+        model.se.out[var.pos] <- s$se
     }
 
     model.se.out <- ifelse(!is.na(model.se.out),
@@ -392,10 +396,10 @@ model.summaries <- coefPosition(model.summaries, coefnames)
                                          format="f"),
                                  ")",sep=""),
                            "")
-    if(se=="both" && !is.null(customSE(x))){
+    if(se=="both" && !is.null(getCustomSE(s))){
       model.se.out[var.pos] <- ifelse(model.se.out != "",
                              paste(model.se.out," [",
-                                   formatC(x$coefficients[,2],
+                                   formatC(s$coefficients[,2],
                                            digits=digits,
                                            format="f"),
                                    "]",sep=""),
@@ -416,7 +420,7 @@ model.summaries <- coefPosition(model.summaries, coefnames)
       model.out <- model.out[incl]
       model.out <- cbind(model.out, model.se.out[incl])
     }
-    attr(model.out,"model.info") <- modelInfo(x)
+    attr(model.out,"model.info") <- modelInfo(s)
     return(model.out)
   })
 
@@ -492,7 +496,7 @@ model.summaries <- coefPosition(model.summaries, coefnames)
   ## Robust is the default, but if only vcov are given,
   ## quietly switch the argument.
   se <- ifelse((se != "vcov" &&
-                sum(unlist(lapply(model.summaries, function(x) !is.null(customSE(x)))) >0 ) ) ,
+                sum(unlist(lapply(model.summaries, function(x) !is.null(getCustomSE(x)))) >0 ) ) ,
                "robust","vcov")
   thenotes <- as.list(1:length(notes))
   thenotes[!sapply(notes,is.function)] <- notes[!sapply(notes,is.function)]

@@ -1,10 +1,26 @@
 
 ## extractor for $se, returns NULL if it's an error
 ## (will be error for s4 objects like 'mer'
-customSE <- function(x) {
-    e <- try(x$se)
-    if(inherits(e, "try-error")) NULL
-    else e
+getCustomSE <- function(x) {
+    se <- try(x$se)
+    if(inherits(se, "try-error")) {
+        warning("Oops: Custom se display requested but none provided.")
+        return(NULL)
+    }
+    else
+        if(any(is.na(coef(x)))) {
+            warning("SE different size from model coefs; ",
+                    "a model is probably singular. Dropping rows.")
+        }
+    return(se)
+}
+tValue <- function(est,se) {
+    if(length(est) != length(se)) {
+        warning("Length mismatch between coefs and $se; ",
+                "probably result of model singularity.",
+                call.=FALSE)
+    }
+    est[!is.na(est)] / se
 }
 
 fround <- function (x, digits) {
@@ -88,7 +104,7 @@ return(model.summaries)
 ## RESULT: union of all models' coefficient names in requested order.
 orderCoef <- function(model.summaries,order="lr") {
   nmodels <- length(model.summaries)
-  mlength <- sapply(model.summaries, function(x) length(coef(x)) )
+  mlength <- sapply(model.summaries, function(x) NROW(coef(x)) )
   longest <- which.max(mlength) # longest model
   if(order=="rl") {
     modelorder <- nmodels:1 } else {
