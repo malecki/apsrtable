@@ -99,12 +99,11 @@ setGeneric("apsrtableSummary", function(object, ...) {
 
 apsrtableSummary.mer <- function (object, ...) {
     require("lme4")
-    fcoef <- coef(s)
+    fcoef <- coef(object)
     out <- list()
     useScale <- object@dims["useSc"]
     corF <- vcov(object)@factors$correlation
     coefs <- cbind(fcoef, corF@sd)
-    browser()
     if (length (fcoef) > 0){
         if (!object@dims["useSc"]) {
             coefs <- coefs[, 1:2, drop = FALSE]
