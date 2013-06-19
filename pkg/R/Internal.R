@@ -1,11 +1,6 @@
 
-##' getCustomSE
-##'
-##' extractor for $se, returns NULL if it's an error
-##' (will be error for s4 objects like 'mer'
-##'
-##' @param x a model object of any supported type
-##' @return the \code{se} vector if it exists
+## extractor for $se, returns NULL if it's an error
+## (will be error for s4 objects like 'mer'
 getCustomSE <- function(x) {
     se <- try(x$se)
     if(is.null(se) || inherits(se, "try-error")) {
@@ -36,15 +31,13 @@ pfround <- function (x, digits) {
     print (fround (x, digits), quote=FALSE)
 }
 
-##' @S3method print apsrtable
+
+
 "print.apsrtable" <- function(x,...) {
   cat(paste(x))
 }
 
-
-##' Extract VarCorr as a matrix from a mer-like object
-##'
-##' borrowed from package arm
+### This borrowed from package 'arm'
 as.matrix.VarCorr <- function (varc, useScale, digits){
     ## VarCorr function for lmer objects, altered as follows:
     ##   1.  specify rounding

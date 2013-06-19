@@ -56,6 +56,7 @@
 ##' \dontrun{
 ##' example(apsrtable)
 ##' }
+##' @exportPattern .*
 setGeneric("modelInfo", function(x) standardGeneric("modelInfo") )
 
 
