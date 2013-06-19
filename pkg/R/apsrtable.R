@@ -285,214 +285,214 @@ apsrtable <- function (...,
         x <- c(x,"%Uncomment the following line and the end one to change figure versions\n%if you are using a full-featured family such as Minion Pro.\n\\figureversion{tabular}\n")
     }
 
-    model.summaries <- lapply(models, .summarize))
+    model.summaries <- lapply(models, .summarize)
 
-## Quietly switch the se.note to the pval.note as needed
-if(se=="pval") { se.note <- pval.note }
+    ## Quietly switch the se.note to the pval.note as needed
+    if(se=="pval") { se.note <- pval.note }
 
-## Set up the model names
-## If there's a vector of names, use that, or as many as there are
-## and either all or the remainder.
-## Optionally, model.number.start allows you to resetcounter
-## TO DO: allow model "name" attribute to be used
-##        but overridden by vector here.
-if (is.null(model.names)) {
-    m.first = model.counter; m.last=m.first+(nmodels-1)
-    model.names=paste("Model", m.first:m.last)
-} else if (!is.null(model.names) && (length(model.names) < nmodels) ) {
-    m.first = length(model.names)+1
-    model.names=c(model.names, paste( "Model", m.first:nmodels))
-}
+    ## Set up the model names
+    ## If there's a vector of names, use that, or as many as there are
+    ## and either all or the remainder.
+    ## Optionally, model.number.start allows you to resetcounter
+    ## TO DO: allow model "name" attribute to be used
+    ##        but overridden by vector here.
+    if (is.null(model.names)) {
+        m.first = model.counter; m.last=m.first+(nmodels-1)
+        model.names=paste("Model", m.first:m.last)
+    } else if (!is.null(model.names) && (length(model.names) < nmodels) ) {
+        m.first = length(model.names)+1
+        model.names=c(model.names, paste( "Model", m.first:nmodels))
+    }
 
-## get and order the coefficient names from all models
-coefnames <- orderCoef(model.summaries, order=order)
+    ## get and order the coefficient names from all models
+    coefnames <- orderCoef(model.summaries, order=order)
 
-## mark those to omit from the output
-incl <- rep(TRUE,length(coefnames))
-names(incl) <- coefnames
-if(!is.null(omitcoef)) {
-    ## Boris Shor <boris@bshor.com> asked how to omitcoef by regex
-    ##  this line enables omitcoef=expression() 2010-03-17
-    ##  OR if you want to mix modes or provide multiple expr
-    ##  you can supply a list() eg list(expression(grep), 15)
-    omitcoef <- unlist(sapply(omitcoef, eval, envir=myenv ))
+    ## mark those to omit from the output
+    incl <- rep(TRUE,length(coefnames))
+    names(incl) <- coefnames
+    if(!is.null(omitcoef)) {
+        ## Boris Shor <boris@bshor.com> asked how to omitcoef by regex
+        ##  this line enables omitcoef=expression() 2010-03-17
+        ##  OR if you want to mix modes or provide multiple expr
+        ##  you can supply a list() eg list(expression(grep), 15)
+        omitcoef <- unlist(sapply(omitcoef, eval, envir=myenv ))
                                         #print(omitcoef)
-    incl[omitcoef] <- FALSE
-}
-## now figure out position of each coef in each model
-model.summaries <- coefPosition(model.summaries, coefnames)
-
-## Now that the coef name matching is done, switch to pretty names
-## if they are supplied.
-if(!is.null(coef.names)) {
-    if(length(coef.names) != sum(incl)) {
-        warning("Supplied coef.names not the same length as output. Check automatic names before supplying 'pretty' names.\n")
+        incl[omitcoef] <- FALSE
     }
-    coefnames[incl] <- coef.names
-} else {
-    coefnames[incl] <- sanitize(coefnames[incl])
-}
+    ## now figure out position of each coef in each model
+    model.summaries <- coefPosition(model.summaries, coefnames)
 
-
-out.table <- lapply(model.summaries, function(s){
-    var.pos <- attr(s,"var.pos")
-    model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
-    model.out[var.pos] <- s$coefficients[,1]
-    if(lev>0) {
-        star.out[var.pos] <- apsrStars(s$coefficients,
-                                       stars=stars,
-                                       lev=lev,signif.stars=TRUE)
+    ## Now that the coef name matching is done, switch to pretty names
+    ## if they are supplied.
+    if(!is.null(coef.names)) {
+        if(length(coef.names) != sum(incl)) {
+            warning("Supplied coef.names not the same length as output. Check automatic names before supplying 'pretty' names.\n")
+        }
+        coefnames[incl] <- coef.names
     } else {
-        star.out <- rep("", length(coefnames))
-    }
-    model.out <- ifelse(!is.na(model.out),
-                        paste(formatC(model.out,digits=digits,format="f"),
-                              star.out),
-                        "")
-
-
-
-    model.se.out[var.pos] <- s$coefficients[,2]
-    if(!is.null(suppressWarnings(getCustomSE(s))) &
-       se %in% c("robust","both") ) {
-        model.se.out[var.pos] <- s$se
+        coefnames[incl] <- sanitize(coefnames[incl])
     }
 
-    model.se.out <- ifelse(!is.na(model.se.out),
-                           paste("(",
-                                 formatC(model.se.out,
-                                         digits=digits,
-                                         format="f"),
-                                 ")",sep=""),
-                           "")
-    if(se=="both" && !is.null(suppressWarnings(getCustomSE(s)))){
-        model.se.out[var.pos] <- ifelse(model.se.out != "",
-                                        paste(model.se.out," [",
-                                              formatC(s$coefficients[,2],
-                                                      digits=digits,
-                                                      format="f"),
-                                              "]",sep=""),
-                                        "")
+
+    out.table <- lapply(model.summaries, function(s){
+        var.pos <- attr(s,"var.pos")
+        model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
+        model.out[var.pos] <- s$coefficients[,1]
+        if(lev>0) {
+            star.out[var.pos] <- apsrStars(s$coefficients,
+                                           stars=stars,
+                                           lev=lev,signif.stars=TRUE)
+        } else {
+            star.out <- rep("", length(coefnames))
+        }
+        model.out <- ifelse(!is.na(model.out),
+                            paste(formatC(model.out,digits=digits,format="f"),
+                                  star.out),
+                            "")
+
+
+
+        model.se.out[var.pos] <- s$coefficients[,2]
+        if(!is.null(suppressWarnings(getCustomSE(s))) &
+           se %in% c("robust","both") ) {
+            model.se.out[var.pos] <- s$se
+        }
+
+        model.se.out <- ifelse(!is.na(model.se.out),
+                               paste("(",
+                                     formatC(model.se.out,
+                                             digits=digits,
+                                             format="f"),
+                                     ")",sep=""),
+                               "")
+        if(se=="both" && !is.null(suppressWarnings(getCustomSE(s)))){
+            model.se.out[var.pos] <- ifelse(model.se.out != "",
+                                            paste(model.se.out," [",
+                                                  formatC(s$coefficients[,2],
+                                                          digits=digits,
+                                                          format="f"),
+                                                  "]",sep=""),
+                                            "")
+        }
+
+        if(coef.rows==2) {
+            ## Create two side by side columns and mesh them together
+            model.out <- rep(model.out[incl], each=2)
+            model.se.out <- rep(model.se.out[incl], each=2)
+            pos.se <- (1:length(model.out))[(1:length(model.out) %% 2==0)]
+            model.out[pos.se] <- model.se.out[pos.se]
+            ## Add a new model info attribute to the model's output entry
+            ## To change modelInfo for a given model, change the method for it
+            ## see ?modelInfo, it is reasonably well documented.
+        } else {
+            ## two columns per model
+            model.out <- model.out[incl]
+            model.out <- cbind(model.out, model.se.out[incl])
+        }
+        attr(model.out,"model.info") <- modelInfo(s)
+        return(model.out)
+    })
+
+    out.matrix <- matrix(unlist(out.table),
+                         length(coefnames[incl])*coef.rows,
+                         nmodels*coef.cols)
+
+    out.matrix <- cbind(rep(coefnames[incl],each=coef.rows), out.matrix)
+    if(coef.rows==2) {
+        out.matrix[ (row(out.matrix)[,1] %% 2 ==0) , 1] <- ""
     }
+    out.info <- lapply(out.table, attr, "model.info")
+    info.names <- orderCoef(out.info)
+    out.info <- coefPosition( out.info, orderCoef(out.info) )
+    out.info <- lapply(out.info, function(x) {
+        var.pos <- attr(x,"var.pos")
+        model.out <- rep("",length(info.names))
+        model.out[var.pos] <- coef(x)
+        return(model.out)
+    } )
+
+    out.info <- matrix(unlist(out.info), length(info.names), nmodels)
+    out.info <- cbind(as.character(info.names), out.info)
 
     if(coef.rows==2) {
-        ## Create two side by side columns and mesh them together
-        model.out <- rep(model.out[incl], each=2)
-        model.se.out <- rep(model.se.out[incl], each=2)
-        pos.se <- (1:length(model.out))[(1:length(model.out) %% 2==0)]
-        model.out[pos.se] <- model.se.out[pos.se]
-        ## Add a new model info attribute to the model's output entry
-        ## To change modelInfo for a given model, change the method for it
-        ## see ?modelInfo, it is reasonably well documented.
-    } else {
-        ## two columns per model
-        model.out <- model.out[incl]
-        model.out <- cbind(model.out, model.se.out[incl])
+        out.matrix <- rbind(c("%",model.names ),out.matrix)
     }
-    attr(model.out,"model.info") <- modelInfo(s)
-    return(model.out)
-})
+    outrows <- nrow(out.matrix)
 
-out.matrix <- matrix(unlist(out.table),
-                     length(coefnames[incl])*coef.rows,
-                     nmodels*coef.cols)
+    ## This does the pretty latex formatting, where commented model names
+    ## line up with appropriately sized columns of numbers.
 
-out.matrix <- cbind(rep(coefnames[incl],each=coef.rows), out.matrix)
-if(coef.rows==2) {
-    out.matrix[ (row(out.matrix)[,1] %% 2 ==0) , 1] <- ""
-}
-out.info <- lapply(out.table, attr, "model.info")
-info.names <- orderCoef(out.info)
-out.info <- coefPosition( out.info, orderCoef(out.info) )
-out.info <- lapply(out.info, function(x) {
-    var.pos <- attr(x,"var.pos")
-    model.out <- rep("",length(info.names))
-    model.out[var.pos] <- coef(x)
-    return(model.out)
-} )
+    ## Paul Johnson suggested a 'wide' or two column format for tables
+    ## which then means model info needs to be underneath the two
+    ## in a multicolumn span. But, for normal (two row, one column per coef)
+    ## format, this is extraneous markup and hard to read.
+    if(coef.cols==1) {
+        out.matrix <- rbind(out.matrix,out.info)
+        out.matrix[,-1] <- format(out.matrix[,-1])
+        out.matrix[,1] <- format(out.matrix)[,1]
+        out.matrix <- apply(out.matrix, 1, paste, collapse=" & ")
+        out.info <- out.matrix[ (1+outrows) : length(out.matrix) ]
+        out.matrix <- out.matrix[ 1:outrows ]
+    } else {
+        out.matrix <- format(out.matrix)
+        out.matrix <- apply(out.matrix, 1, paste, collapse=" & ")
+        ## now do the out.info as multicolumn blocks
+        out.info[,-1] <- format(out.info[,-1])
+        out.info[,-1] <- sapply(as.matrix(out.info[,-1]), function(x) {
+            paste("\\multicolumn{",coef.cols,"}{",multicolumn.align,
+                  "}{",x,"}",sep="")
+        })
+        out.info[,1] <- format(out.info[,1])
+        out.info <- apply(out.info, 1, paste, collapse=" & ")
+    }
 
-out.info <- matrix(unlist(out.info), length(info.names), nmodels)
-out.info <- cbind(as.character(info.names), out.info)
-
-if(coef.rows==2) {
-    out.matrix <- rbind(c("%",model.names ),out.matrix)
-}
-outrows <- nrow(out.matrix)
-
-## This does the pretty latex formatting, where commented model names
-## line up with appropriately sized columns of numbers.
-
-## Paul Johnson suggested a 'wide' or two column format for tables
-## which then means model info needs to be underneath the two
-## in a multicolumn span. But, for normal (two row, one column per coef)
-## format, this is extraneous markup and hard to read.
-if(coef.cols==1) {
-    out.matrix <- rbind(out.matrix,out.info)
-    out.matrix[,-1] <- format(out.matrix[,-1])
-    out.matrix[,1] <- format(out.matrix)[,1]
-    out.matrix <- apply(out.matrix, 1, paste, collapse=" & ")
-    out.info <- out.matrix[ (1+outrows) : length(out.matrix) ]
-    out.matrix <- out.matrix[ 1:outrows ]
-} else {
-    out.matrix <- format(out.matrix)
-    out.matrix <- apply(out.matrix, 1, paste, collapse=" & ")
-    ## now do the out.info as multicolumn blocks
-    out.info[,-1] <- format(out.info[,-1])
-    out.info[,-1] <- sapply(as.matrix(out.info[,-1]), function(x) {
-        paste("\\multicolumn{",coef.cols,"}{",multicolumn.align,
-              "}{",x,"}",sep="")
-    })
-    out.info[,1] <- format(out.info[,1])
-    out.info <- apply(out.info, 1, paste, collapse=" & ")
-}
-
-headrow <- paste("\n\\hline \n",
-                 paste(" &", paste("\\multicolumn{",coef.cols,"}{",
-                                   multicolumn.align,"}{",
-                                   model.names,"}", collapse=" & ")  ),
-                 "\\\\ \\hline\n")
-if(long) { headrow <- paste(headrow,"\\endhead\n",sep="") }
-x <- c(x, headrow)
+    headrow <- paste("\n\\hline \n",
+                     paste(" &", paste("\\multicolumn{",coef.cols,"}{",
+                                       multicolumn.align,"}{",
+                                       model.names,"}", collapse=" & ")  ),
+                     "\\\\ \\hline\n")
+    if(long) { headrow <- paste(headrow,"\\endhead\n",sep="") }
+    x <- c(x, headrow)
 
                                         #x <- c(x,"")
-x <- c(x,paste(out.matrix, collapse="\\\\ \n"))
-x <- c(x,"\\\\\n")
-x <- c(x,paste(out.info, collapse="\\\\ \n"))
+    x <- c(x,paste(out.matrix, collapse="\\\\ \n"))
+    x <- c(x,"\\\\\n")
+    x <- c(x,paste(out.info, collapse="\\\\ \n"))
 
-## Do notes
-## Evaluate the notes list
-## Switch the se to either robust or regular --
-## Robust is the default, but if only vcov are given,
-## quietly switch the argument.
-se <- ifelse((se != "vcov" &&
-              sum(unlist(lapply(model.summaries, function(x){
-                  !is.null(suppressWarnings(getCustomSE(x)))
-              }))>0)), "robust", "vcov")
-thenotes <- as.list(1:length(notes))
-thenotes[!sapply(notes,is.function)] <- notes[!sapply(notes,is.function)]
-thenotes[sapply(notes,is.function)] <- lapply(notes[sapply(notes,is.function)],
-                                              do.call,
-                                              args=list(env=myenv))
+    ## Do notes
+    ## Evaluate the notes list
+    ## Switch the se to either robust or regular --
+    ## Robust is the default, but if only vcov are given,
+    ## quietly switch the argument.
+    se <- ifelse((se != "vcov" &&
+                  sum(unlist(lapply(model.summaries, function(x){
+                      !is.null(suppressWarnings(getCustomSE(x)))
+                  }))>0)), "robust", "vcov")
+    thenotes <- as.list(1:length(notes))
+    thenotes[!sapply(notes,is.function)] <- notes[!sapply(notes,is.function)]
+    thenotes[sapply(notes,is.function)] <- lapply(notes[sapply(notes,is.function)],
+                                                  do.call,
+                                                  args=list(env=myenv))
 
-x <- c(x,"\\\\ \\hline\n")
-notes <- lapply(thenotes, function(x) {
-    ##eek! note coef cols was wrong
-    ## fixed 2009-05-07 mjm
-    paste("\\multicolumn{", (nmodels*coef.cols)+1,
-          "}{l}{\\footnotesize{", x , "}}",sep="")
-} )
-x <- c(x, paste(notes, collapse="\\\\\n"))
+    x <- c(x,"\\\\ \\hline\n")
+    notes <- lapply(thenotes, function(x) {
+        ##eek! note coef cols was wrong
+        ## fixed 2009-05-07 mjm
+        paste("\\multicolumn{", (nmodels*coef.cols)+1,
+              "}{l}{\\footnotesize{", x , "}}",sep="")
+    } )
+    x <- c(x, paste(notes, collapse="\\\\\n"))
 
-if(!long) { x <- c(x,"\n\\end{tabular}") }
-if(long) { x <- c(x,"\n\\end{longtable}") }
-if(caption.position=="b") {
-    x <- c(x, paste("\n\\caption{",caption,"}\n\\label{",label,"}",sep=""))
-}
-x <- c(x,"\n")
-if(Minionfig) {x <- c(x,"\n\\figureversion{proportional}\n") }
-if(!Sweave & !long) { x <- c(x,paste("\\end{",float,"}\n",sep="")) }
-class(x) <- "apsrtable"
-(x)
+    if(!long) { x <- c(x,"\n\\end{tabular}") }
+    if(long) { x <- c(x,"\n\\end{longtable}") }
+    if(caption.position=="b") {
+        x <- c(x, paste("\n\\caption{",caption,"}\n\\label{",label,"}",sep=""))
+    }
+    x <- c(x,"\n")
+    if(Minionfig) {x <- c(x,"\n\\figureversion{proportional}\n") }
+    if(!Sweave & !long) { x <- c(x,paste("\\end{",float,"}\n",sep="")) }
+    class(x) <- "apsrtable"
+    (x)
 }
 
 
