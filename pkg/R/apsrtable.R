@@ -521,7 +521,7 @@ model.summaries <- coefPosition(model.summaries, coefnames)
   if(Minionfig) {x <- c(x,"\n\\figureversion{proportional}\n") }
   if(!Sweave & !long) { x <- c(x,paste("\\end{",float,"}\n",sep="")) }
   class(x) <- "apsrtable"
-  return(x)
+  (x)
 }
 
 

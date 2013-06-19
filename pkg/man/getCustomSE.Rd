@@ -1,0 +1,17 @@
+\name{getCustomSE}
+\alias{getCustomSE}
+\title{getCustomSE}
+\usage{
+  getCustomSE(x)
+}
+\arguments{
+  \item{x}{a model object of any supported type}
+}
+\value{
+  the \code{se} vector if it exists
+}
+\description{
+  extractor for $se, returns NULL if it's an error (will be
+  error for s4 objects like 'mer'
+}
+

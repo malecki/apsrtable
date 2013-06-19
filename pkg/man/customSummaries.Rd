@@ -1,9 +1,26 @@
 \docType{methods}
 \name{apsrtableSummary}
 \alias{apsrtableSummary}
+\alias{apsrtableSummary,ANY-method}
+\alias{apsrtableSummary,mer-method}
+\alias{apsrtableSummary.clogit}
+\alias{apsrtableSummary.gee}
+\alias{apsrtableSummary.lrm}
+\alias{apsrtableSummary.negbin}
+\alias{apsrtableSummary.polr}
 \title{Custom summary functions for output tables}
 \usage{
   apsrtableSummary(object, ...)
+
+  apsrtableSummary.lrm(x)
+
+  apsrtableSummary.polr(x)
+
+  apsrtableSummary.gee(x)
+
+  apsrtableSummary.clogit(x)
+
+  apsrtableSummary.negbin(x)
 }
 \arguments{
   \item{object}{A model object to be summarized in a format
