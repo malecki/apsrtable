@@ -20,13 +20,17 @@
 ##' produce a suitable \code{summary} object.
 ##' Ideally, the former is a stopgap for the latter.
 ##'
-##' @aliases apsrtableSummary apsrtableSummary.gee apsrtableSummary.lrm
-##' @param x A model object to be summarized in a format suitable for
+##' @docType methods
+##' @rdname customSummaries
+##' @aliases apsrtableSummary
+##' @param object A model object to be summarized in a format suitable for
 ##' \code{apsrtable} output.
+##' @param ... further arguments to any custom summary methods
+##'
 ##' @return A \code{summary} representation of a model object,
 ##' probably derived  from the object's own \code{summary} method.
-##' @author Michael Malecki <malecki at wustl.edu>
-##' @import lme4
+##' @author Michael Malecki <malecki at gmail.com>
+##' @export
 ##' @examples
 ##'
 ##' ### summary.gee produces z scores but not Pr(z). This converts the relevant columns
@@ -51,130 +55,136 @@
 ##'   return(s)
 ##' }
 ##'
+"apsrtableSummary" <- function(object, ...) {
+    UseMethod("apsrtableSummary") }
 
+##' @rdname customSummaries
+##' @aliases apsrtableSummary,ANY-method
+##' @export
 setGeneric("apsrtableSummary", function(object, ...) {
     standardGeneric("apsrtableSummary") })
 
-"apsrtableSummary" <- function(object, ...) {
-  UseMethod("apsrtableSummary") }
-
-
 apsrtableSummary.mer <- function (object, ...) {
-  fcoef <- coef(s)
-  out <- list()
-  useScale <- object@dims["useSc"]
-  corF <- vcov(object)@factors$correlation
-  coefs <- cbind(fcoef, corF@sd)
-  browser()
-  if (length (fcoef) > 0){
-      if (!object@dims["useSc"]) {
-        coefs <- coefs[, 1:2, drop = FALSE]
-        out$z.value <- coefs[, 1]/coefs[, 2]
-        out$p.value <- 2 * pnorm(abs(out$z.value), lower = FALSE)
-        coefs <- cbind(coefs,
-                       `z value` = out$z.value,
-                       `Pr(>|z|)` = out$p.value)
-      }
-      else {
-        out$t.value <- coefs[, 1]/coefs[, 2]
-        coefs <- cbind(coefs, `t value` = out$t.value)
-      }
-    dimnames(coefs)[[2]][1:2] <- c("coef.est", "coef.se")
-      if(detail){
-        pfround (coefs, digits)
-      }
-      else{
-        pfround(coefs[,1:2], digits)
+    require("lme4")
+    fcoef <- coef(s)
+    out <- list()
+    useScale <- object@dims["useSc"]
+    corF <- vcov(object)@factors$correlation
+    coefs <- cbind(fcoef, corF@sd)
+    browser()
+    if (length (fcoef) > 0){
+        if (!object@dims["useSc"]) {
+            coefs <- coefs[, 1:2, drop = FALSE]
+            out$z.value <- coefs[, 1]/coefs[, 2]
+            out$p.value <- 2 * pnorm(abs(out$z.value), lower = FALSE)
+            coefs <- cbind(coefs,
+                           `z value` = out$z.value,
+                           `Pr(>|z|)` = out$p.value)
+        }
+        else {
+            out$t.value <- coefs[, 1]/coefs[, 2]
+            coefs <- cbind(coefs, `t value` = out$t.value)
+        }
+        dimnames(coefs)[[2]][1:2] <- c("coef.est", "coef.se")
+        if(detail){
+            pfround (coefs, digits)
+        }
+        else{
+            pfround(coefs[,1:2], digits)
+        }
     }
-  }
-  out$coef <- coefs[,"coef.est"]
-  out$se <- coefs[,"coef.se"]
-  vc <- as.matrix.VarCorr (VarCorr (object),
-                           useScale=useScale, digits)
-  vc[,1] <-
-  print (vc[,c(1:2,4:ncol(vc))], quote=FALSE)
+    out$coef <- coefs[,"coef.est"]
+    out$se <- coefs[,"coef.se"]
+    vc <- as.matrix.VarCorr (VarCorr (object),
+                             useScale=useScale, digits)
+    vc[,1] <-
+        print (vc[,c(1:2,4:ncol(vc))], quote=FALSE)
 
-  out$ngrps <- lapply(object@flist, function(x) length(levels(x)))
-  ## Model fit statistics.
-  ll <- logLik(obj)[1]
-  deviance <- deviance(obj)
-  AIC <- AIC(obj)
-  BIC <- BIC(obj)
-  N <- as.numeric(smry@dims["n"])
-  G <- as.numeric(smry@ngrps)
-  sumstat <- c(logLik = ll, deviance = deviance, AIC = AIC,
-               BIC = BIC, N = N, Groups = G)
+    out$ngrps <- lapply(object@flist, function(x) length(levels(x)))
+    ## Model fit statistics.
+    ll <- logLik(obj)[1]
+    deviance <- deviance(obj)
+    AIC <- AIC(obj)
+    BIC <- BIC(obj)
+    N <- as.numeric(smry@dims["n"])
+    G <- as.numeric(smry@ngrps)
+    sumstat <- c(logLik = ll, deviance = deviance, AIC = AIC,
+                 BIC = BIC, N = N, Groups = G)
 
-  ## Return model summary.
-  list(coef = coef, sumstat = sumstat,
-       contrasts = attr(model.matrix(obj), "contrasts"),
-       xlevels = xlevels, call = obj@call)
+    ## Return model summary.
+    list(coef = coef, sumstat = sumstat,
+         contrasts = attr(model.matrix(obj), "contrasts"),
+         xlevels = xlevels, call = obj@call)
 }
+##' @rdname customSummaries
+##' @import lme4
+##' @aliases apsrtableSummary,mer-method
 setMethod("apsrtableSummary", "mer", apsrtableSummary.mer)
-setMethod("summary","mer", selectMethod("summary","mer","package:lme4"))
 
 
 
-## Req by Solomon Messing. This fxn is based on print.lrm, which seems
-## to contain everything needed for table and modelinfo.
+##' @rdname customSummaries
+##' @S3method apsrtableSummary lrm
 apsrtableSummary.lrm <- function (x) {
-  digits <- 4
-  strata.coefs <- FALSE
-  sg <- function(x, d) {
-    oldopt <- options(digits = d)
-    on.exit(options(oldopt))
-    format(x)
-  }
-  rn <- function(x, d) format(round(as.single(x), d))
-
-  ##cat("\n")
-    if (x$fail) {
-      cat("Model Did Not Converge\n")
-      return()
+    ## Req by Solomon Messing. This fxn is based on print.lrm, which seems
+    ## to contain everything needed for table and modelinfo.
+    digits <- 4
+    strata.coefs <- FALSE
+    sg <- function(x, d) {
+        oldopt <- options(digits = d)
+        on.exit(options(oldopt))
+        format(x)
     }
-  ##cat("Logistic Regression Model\n\n")
-  ##sdput(x$call)
-  ##cat("\n\nFrequencies of Responses\n")
-  ##print(x$freq)
-  if (length(x$sumwty)) {
-    ##cat("\n\nSum of Weights by Response Category\n")
-    ##print(x$sumwty)
-  }
-  ##cat("\n")
-  if (!is.null(x$nmiss)) {
-    ##cat("Frequencies of Missing Values Due to Each Variable\n")
-    ##print(x$nmiss)
+    rn <- function(x, d) format(round(as.single(x), d))
+
     ##cat("\n")
-  }
-  else if (!is.null(x$na.action))
-    ##naprint(x$na.action)
-  ns <- x$non.slopes
-  nstrata <- x$nstrata
-  if (!length(nstrata))
-    nstrata <- 1
-  pm <- x$penalty.matrix
-  if (length(pm)) {
-    psc <- if (length(pm) == 1)
-      sqrt(pm)
-    else sqrt(diag(pm))
-    penalty.scale <- c(rep(0, ns), psc)
-    cof <- matrix(x$coef[-(1:ns)], ncol = 1)
-    ##cat("Penalty factors:\n\n")
-    ##print(as.data.frame(x$penalty, row.names = ""))
-    ##cat("\nFinal penalty on -2 log L:", rn(t(cof) %*% pm %*%
-    ##    cof, 2), "\n\n")
-  }
-  vv <- diag(x$var)
+    if (x$fail) {
+        cat("Model Did Not Converge\n")
+        return()
+    }
+    ##cat("Logistic Regression Model\n\n")
+    ##sdput(x$call)
+    ##cat("\n\nFrequencies of Responses\n")
+    ##print(x$freq)
+    if (length(x$sumwty)) {
+        ##cat("\n\nSum of Weights by Response Category\n")
+        ##print(x$sumwty)
+    }
+    ##cat("\n")
+    if (!is.null(x$nmiss)) {
+        ##cat("Frequencies of Missing Values Due to Each Variable\n")
+        ##print(x$nmiss)
+        ##cat("\n")
+    }
+    else if (!is.null(x$na.action))
+        ##naprint(x$na.action)
+        ns <- x$non.slopes
+    nstrata <- x$nstrata
+    if (!length(nstrata))
+        nstrata <- 1
+    pm <- x$penalty.matrix
+    if (length(pm)) {
+        psc <- if (length(pm) == 1)
+            sqrt(pm)
+        else sqrt(diag(pm))
+        penalty.scale <- c(rep(0, ns), psc)
+        cof <- matrix(x$coef[-(1:ns)], ncol = 1)
+        ##cat("Penalty factors:\n\n")
+        ##print(as.data.frame(x$penalty, row.names = ""))
+        ##cat("\nFinal penalty on -2 log L:", rn(t(cof) %*% pm %*%
+        ##    cof, 2), "\n\n")
+    }
+    vv <- diag(x$var)
     cof <- x$coef
     if (strata.coefs) {
         cof <- c(cof, x$strata.coef)
         vv <- c(vv, x$Varcov(x, which = "strata.var.diag"))
         if (length(pm))
             penalty.scale <- c(penalty.scale, rep(NA, x$nstrat -
-                1))
+                                                  1))
     }
     score.there <- nstrata == 1 && (length(x$est) < length(x$coef) -
-        ns)
+                   ns)
     stats <- x$stats
     stats[2] <- signif(stats[2], 1)
     stats[3] <- round(stats[3], 2)
@@ -200,10 +210,10 @@ apsrtableSummary.lrm <- function (x) {
     z <- cof/sqrt(vv)
     stats <- cbind(cof,vv,cof/sqrt(vv) )
     stats <- cbind(stats, (1 - pchisq(z^2, 1)))
-  ugh <- names(cof)
-  names(cof) <- sub("Intercept","(Intercept)",ugh)
+    ugh <- names(cof)
+    names(cof) <- sub("Intercept","(Intercept)",ugh)
     dimnames(stats) <- list(names(cof), c("Coef", "S.E.", "Wald Z",
-        "Pr(z)"))
+                                          "Pr(z)"))
     if (length(pm))
         stats <- cbind(stats, `Penalty Scale` = penalty.scale)
     ##print(stats, quote = FALSE)
@@ -220,61 +230,68 @@ apsrtableSummary.lrm <- function (x) {
         ##printd(stats, quote = FALSE)
         ##cat("\n")
     }
-  res$coefficients <- stats
-  class(res) <- "summary.lrm"
-  invisible(res)
+    res$coefficients <- stats
+    class(res) <- "summary.lrm"
+    invisible(res)
 }
 
 
 
-## Added support for MASS::polr
-## mjm 2012-05-20
+##' @rdname customSummaries
+##' @S3method apsrtableSummary polr
 "apsrtableSummary.polr" <- function (x) {
-       s <- summary(x)
-       newCoef <- coef(s)
-       newCoef <- cbind(newCoef, pt(abs(coef(s)[,3]),
-                         df=s$n-s$edf-1,
-                         lower.tail=FALSE))
-       colnames(newCoef) <- c("coef","se(coef)", "t value", "Pr(>|t|)")
-       s$coefficients <- newCoef
-       return(s)
+    ## Added support for MASS::polr
+    ## mjm 2012-05-20
+    s <- summary(x)
+    newCoef <- coef(s)
+    newCoef <- cbind(newCoef, pt(abs(coef(s)[,3]),
+                                 df=s$n-s$edf-1,
+                                 lower.tail=FALSE))
+    colnames(newCoef) <- c("coef","se(coef)", "t value", "Pr(>|t|)")
+    s$coefficients <- newCoef
+    return(s)
 
 }
 
-
+##' @rdname customSummaries
+##' @S3method apsrtableSummary gee
 "apsrtableSummary.gee" <- function(x) {
-  s <- summary(x)
-  newCoef <- coef(s)
-  ## which columns have z scores? (two of them in robust case)
-  zcols <- grep("z",colnames(newCoef))
-  newCoef[,zcols] <- pnorm(abs(newCoef[,zcols]), lower.tail=FALSE)
-  colnames(newCoef)[zcols] <- "Pr(z)"
-  s$coefficients <- newCoef
-  ## put the robust se in $se so that notefunction works automatically
-  ## the se checker will overwrite [,4] with pt, but this doesn't matter
-  ## because the last column Pr(z) is used by apsrstars() anyway
-  ## and the se are pulled from $se.
-  if( class(x)[1] == "gee.robust") {
-    s$se <- coef(s)[,4]
-  }
-  return(s)
+    s <- summary(x)
+    newCoef <- coef(s)
+    ## which columns have z scores? (two of them in robust case)
+    zcols <- grep("z",colnames(newCoef))
+    newCoef[,zcols] <- pnorm(abs(newCoef[,zcols]), lower.tail=FALSE)
+    colnames(newCoef)[zcols] <- "Pr(z)"
+    s$coefficients <- newCoef
+    ## put the robust se in $se so that notefunction works automatically
+    ## the se checker will overwrite [,4] with pt, but this doesn't matter
+    ## because the last column Pr(z) is used by apsrstars() anyway
+    ## and the se are pulled from $se.
+    if( class(x)[1] == "gee.robust") {
+        s$se <- coef(s)[,4]
+    }
+    return(s)
 }
 
+##' @rdname customSummaries
+##' @S3method apsrtableSummary clogit
 "apsrtableSummary.clogit" <- apsrtableSummary.coxph <- function (x) {
-       s <- summary(x)
-       if("robust se" %in% colnames(coef(s))) s$se <- coef(s)[,"robust se"]
-       s$coefficients <- coef(s)[,c("coef","se(coef)", "Pr(>|z|)")]
-       return(s)
+    s <- summary(x)
+    if("robust se" %in% colnames(coef(s))) s$se <- coef(s)[,"robust se"]
+    s$coefficients <- coef(s)[,c("coef","se(coef)", "Pr(>|z|)")]
+    return(s)
 }
+##' @rdname customSummaries
+##' @S3method apsrtableSummary negbin
 "apsrtableSummary.negbin" <- function (x) {
-       s <- summary(x)
-       coefs <- coef(s)
-       theta <- matrix(c(s$theta, s$SE.theta,NA,NA),1,4)
-       theta[,3] <- theta[,1]/theta[,2] ;
-       theta[,4] <- pnorm(abs(theta[,3]),lower.tail=FALSE)
-       rownames(theta) <- "$\\theta$"
-       s$coefficients <- rbind(coefs,theta)
-       return(s)
+    s <- summary(x)
+    coefs <- coef(s)
+    theta <- matrix(c(s$theta, s$SE.theta,NA,NA),1,4)
+    theta[,3] <- theta[,1]/theta[,2] ;
+    theta[,4] <- pnorm(abs(theta[,3]),lower.tail=FALSE)
+    rownames(theta) <- "$\\theta$"
+    s$coefficients <- rbind(coefs,theta)
+    return(s)
 }
 
 setOldClass("summary.lm")
