@@ -284,40 +284,7 @@ apsrtable <- function (...,
 
 
   ## get the summaries for the objects
-  model.summaries <- lapply(models, function(x) {
-      ## If an apsrtableSummary exists, use it
-      ## Otherwise, use summary.
-
-      s <- try(apsrtableSummary(x), silent=TRUE)
-      if (inherits(s, "try-error")) {
-          s <- summary(x)
-      }
-      theSE <- getCustomSE(x)
-      if(!is.null(theSE) && se != "vcov") {
-          ## take first column of summary NOT coef(model)
-          ## this already omits NA 'aliased' coefs
-          est <- coef(s)[, 1]
-          if(class(theSE) == "matrix") {
-              theSE <- sqrt(diag(theSE))
-          }
-          s$coefficients[, 3] <- tval <- tValue(est, theSE)
-          e <- try(s$coefficients[, 4] <-
-                   2 * pt(abs(tval),
-                          length(x$residuals) - x$rank,
-                          lower.tail=FALSE),silent=TRUE)
-          if(inherits(e,"try-error")){
-              s$coefficients[, 4] <-
-                  2*pnorm(abs(tval),lower.tail=FALSE)
-          }
-          s$se <- theSE
-      }
-      if(se == "pval") {
-          ## definitely a hack: just replace the column
-          ## with this one instead.
-          s$coefficients[,2] <- s$coefficients[, 4]
-      }
-      return(s)
-  } )
+  model.summaries <- lapply(models, .summarize))
 
   ## Quietly switch the se.note to the pval.note as needed
   if(se=="pval") { se.note <- pval.note }

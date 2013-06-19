@@ -2,7 +2,40 @@
 ## where the model-package provides a summary not suitable for apsrtable,
 ## such as z scores instead of pnorms.
 
+.summarize <- function(modelObject) {
+    ## If an apsrtableSummary exists, use it
+    ## Otherwise, use summary.
 
+    s <- try(apsrtableSummary(modelObject), silent=TRUE)
+    if (inherits(s, "try-error")) {
+        s <- summary(modelObject)
+    }
+    theSE <- getCustomSE(modelObject)
+    if(!is.null(theSE) && se != "vcov") {
+        ## take first column of summary NOT coef(model)
+        ## this already omits NA 'aliased' coefs
+        est <- coef(s)[, 1]
+        if(class(theSE) == "matrix") {
+            theSE <- sqrt(diag(theSE))
+        }
+        s$coefficients[, 3] <- tval <- tValue(est, theSE)
+        e <- try(s$coefficients[, 4] <-
+                 2 * pt(abs(tval),
+                        length(modelObject$residuals) - modelObject$rank,
+                        lower.tail=FALSE),silent=TRUE)
+        if(inherits(e,"try-error")){
+            s$coefficients[, 4] <-
+                2*pnorm(abs(tval),lower.tail=FALSE)
+        }
+        s$se <- theSE
+    }
+    if(se == "pval") {
+        ## definitely a hack: just replace the column
+        ## with this one instead.
+        s$coefficients[,2] <- s$coefficients[, 4]
+    }
+    return(s)
+}
 
 ##' Custom summary functions for output tables
 ##'
