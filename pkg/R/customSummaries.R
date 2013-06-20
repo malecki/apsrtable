@@ -97,6 +97,7 @@
 setGeneric("apsrtableSummary", function(object, ...) {
     standardGeneric("apsrtableSummary") })
 
+##trace("apsrtableSummary", browser, exit=recover, signature="mer")
 apsrtableSummary.mer <- function (object, ...) {
     require("lme4")
     fcoef <- coef(object)
