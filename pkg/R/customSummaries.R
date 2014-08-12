@@ -59,15 +59,15 @@ setGeneric("apsrtableSummary", function(object, ...) {
   UseMethod("apsrtableSummary") }
 
 
-apsrtableSummary.mer <- function (object, ...) {
-  fcoef <- coef(s)
+apsrtableSummary.merMod <- function (object, ...) {
+  obj <- summary(object)
+  fcoef <- coef(obj)
   out <- list()
-  useScale <- object@dims["useSc"]
+  useScale <- obj$useScale
   corF <- vcov(object)@factors$correlation
   coefs <- cbind(fcoef, corF@sd)
-  browser()
   if (length (fcoef) > 0){
-      if (!object@dims["useSc"]) {
+      if (obj$useScale == FALSE) {
         coefs <- coefs[, 1:2, drop = FALSE]
         out$z.value <- coefs[, 1]/coefs[, 2]
         out$p.value <- 2 * pnorm(abs(out$z.value), lower = FALSE)
@@ -80,38 +80,38 @@ apsrtableSummary.mer <- function (object, ...) {
         coefs <- cbind(coefs, `t value` = out$t.value)
       }
     dimnames(coefs)[[2]][1:2] <- c("coef.est", "coef.se")
-      if(detail){
-        pfround (coefs, digits)
-      }
-      else{
-        pfround(coefs[,1:2], digits)
-    }
+#       if(detail){
+#         pfround (coefs, digits)
+#       }
+#       else{
+#         pfround(coefs[,1:2], digits)
+#     }
   }
   out$coef <- coefs[,"coef.est"]
   out$se <- coefs[,"coef.se"]
-  vc <- as.matrix.VarCorr (VarCorr (object),
-                           useScale=useScale, digits)
-  vc[,1] <-
-  print (vc[,c(1:2,4:ncol(vc))], quote=FALSE)
+#   vc <- as.matrix(VarCorr(object, digits))
+#   vc[,1] <-
+#   print (vc[,c(1:2,4:ncol(vc))], quote=FALSE)
 
   out$ngrps <- lapply(object@flist, function(x) length(levels(x)))
   ## Model fit statistics.
-  ll <- logLik(obj)[1]
-  deviance <- deviance(obj)
-  AIC <- AIC(obj)
-  BIC <- BIC(obj)
-  N <- as.numeric(smry@dims["n"])
-  G <- as.numeric(smry@ngrps)
+  ll <- logLik(object)[1]
+  deviance <- deviance(object)
+  AIC <- AIC(object)
+  BIC <- BIC(object)
+  N <- as.numeric(length(obj$residuals))
+  G <- as.numeric(obj$ngrps)
   sumstat <- c(logLik = ll, deviance = deviance, AIC = AIC,
                BIC = BIC, N = N, Groups = G)
 
   ## Return model summary.
   list(coef = coef, sumstat = sumstat,
-       contrasts = attr(model.matrix(obj), "contrasts"),
-       xlevels = xlevels, call = obj@call)
+       contrasts = attr(model.matrix(object), "contrasts"),
+       xlevels = NULL, call = object@call)
 }
-setMethod("apsrtableSummary", "mer", apsrtableSummary.mer)
-setMethod("summary","mer", selectMethod("summary","mer","package:lme4"))
+
+setMethod("apsrtableSummary", "merMod", apsrtableSummary.mer)
+setMethod("summary","merMod", selectMethod("summary","merMod","package:lme4"))
 
 
 
