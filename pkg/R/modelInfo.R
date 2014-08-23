@@ -89,6 +89,17 @@ modelInfo.summary.glm <- function(x) {
   invisible(model.info)
 }
 
+modelInfo.summary.merMod <- function(x) {
+  env <- sys.parent()
+  digits <- evalq(digits, envir=env)
+  model.info <- list(
+                "$N$"=formatC(as.numeric(x$devcomp$dims['n']),format="d"),
+                "AIC"=formatC(as.numeric(x$AICtab),
+                format="f",digits=digits),
+                "Groups"=as.numeric(x$ngrps))
+  class(model.info) <- "model.info"
+  invisible(model.info)
+}
 
 
 ## 2009-02-25 mjm
@@ -186,3 +197,4 @@ setMethod("modelInfo", "summary.lrm", modelInfo.summary.lrm )
 setMethod("modelInfo", "summary.svyglm",
           apsrtable:::modelInfo.summary.glm )
 setMethod("modelInfo","summary.polr", modelInfo.summary.polr)
+setMethod("modelInfo","summary.merMod", modelInfo.summary.merMod)

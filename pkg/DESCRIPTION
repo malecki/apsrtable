@@ -9,6 +9,8 @@ Depends:
     methods
 Imports:
     lme4
+Suggests:
+    testthat
 Description: Formats latex tables from one or more model objects side-by-side
     with standard errors below, not unlike tables found in such journals as the
     American Political Science Review.

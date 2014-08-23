@@ -7,7 +7,7 @@
 ##' @param x a model object of any supported type
 ##' @return the \code{se} vector if it exists
 getCustomSE <- function(x) {
-    se <- try(x$se)
+    se <- try(getElement(x, "se"))
     if(is.null(se) || inherits(se, "try-error")) {
         warning("Oops: Custom se display requested but none provided.")
         return(NULL)

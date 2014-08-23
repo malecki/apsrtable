@@ -5,10 +5,12 @@
 .summarize <- function(modelObject) {
     ## If an apsrtableSummary exists, use it
     ## Otherwise, use summary.
-
     s <- try(apsrtableSummary(modelObject), silent=TRUE)
     if (inherits(s, "try-error")) {
         s <- summary(modelObject)
+    }
+    if("merMod" %in% is(modelObject)){
+        return(s)
     }
     theSE <- getCustomSE(modelObject)
     if(!is.null(theSE) && se != "vcov") {
@@ -96,65 +98,6 @@
 ##' @export
 setGeneric("apsrtableSummary", function(object, ...) {
     standardGeneric("apsrtableSummary") })
-
-##trace("apsrtableSummary", browser, exit=recover, signature="mer")
-apsrtableSummary.mer <- function (object, ...) {
-    require("lme4")
-    fcoef <- coef(object)
-    out <- list()
-    useScale <- object@dims["useSc"]
-    corF <- vcov(object)@factors$correlation
-    coefs <- cbind(fcoef, corF@sd)
-    if (length (fcoef) > 0){
-        if (!object@dims["useSc"]) {
-            coefs <- coefs[, 1:2, drop = FALSE]
-            out$z.value <- coefs[, 1]/coefs[, 2]
-            out$p.value <- 2 * pnorm(abs(out$z.value), lower = FALSE)
-            coefs <- cbind(coefs,
-                           `z value` = out$z.value,
-                           `Pr(>|z|)` = out$p.value)
-        }
-        else {
-            out$t.value <- coefs[, 1]/coefs[, 2]
-            coefs <- cbind(coefs, `t value` = out$t.value)
-        }
-        dimnames(coefs)[[2]][1:2] <- c("coef.est", "coef.se")
-        if(detail){
-            pfround (coefs, digits)
-        }
-        else{
-            pfround(coefs[,1:2], digits)
-        }
-    }
-    out$coef <- coefs[,"coef.est"]
-    out$se <- coefs[,"coef.se"]
-    vc <- as.matrix.VarCorr (VarCorr (object),
-                             useScale=useScale, digits)
-    vc[,1] <-
-        print (vc[,c(1:2,4:ncol(vc))], quote=FALSE)
-
-    out$ngrps <- lapply(object@flist, function(x) length(levels(x)))
-    ## Model fit statistics.
-    ll <- logLik(obj)[1]
-    deviance <- deviance(obj)
-    AIC <- AIC(obj)
-    BIC <- BIC(obj)
-    N <- as.numeric(smry@dims["n"])
-    G <- as.numeric(smry@ngrps)
-    sumstat <- c(logLik = ll, deviance = deviance, AIC = AIC,
-                 BIC = BIC, N = N, Groups = G)
-
-    ## Return model summary.
-    list(coef = coef, sumstat = sumstat,
-         contrasts = attr(model.matrix(obj), "contrasts"),
-         xlevels = xlevels, call = obj@call)
-}
-##' @rdname customSummaries
-##' @import lme4
-##' @aliases apsrtableSummary,mer-method
-setMethod("apsrtableSummary", "mer", apsrtableSummary.mer)
-
-
 
 ##' @rdname customSummaries
 ##' @S3method apsrtableSummary lrm
