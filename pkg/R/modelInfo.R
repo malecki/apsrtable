@@ -96,7 +96,9 @@ modelInfo.summary.merMod <- function(x) {
                 "$N$"=formatC(as.numeric(x$devcomp$dims['n']),format="d"),
                 "AIC"=formatC(as.numeric(x$AICtab),
                 format="f",digits=digits),
-                "Groups"=as.numeric(x$ngrps))
+                "N Groups"=as.numeric(x$ngrps), 
+                "Group Names" = names(x$varcor), 
+                "")
   class(model.info) <- "model.info"
   invisible(model.info)
 }
