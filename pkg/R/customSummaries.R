@@ -271,7 +271,7 @@ apsrtableSummary.lrm <- function (x) {
 }
 ##' @rdname customSummaries
 ##' @S3method apsrtableSummary rms
-"apsrtableSummary.rms" <- function(x) {
+apsrtableSummary.rms <- function(x) {
   s <- summary.lm(x)
   newCoef <- coef(s)
   ## which columns have z scores? (two of them in robust case)
@@ -283,7 +283,9 @@ apsrtableSummary.lrm <- function (x) {
   ## the se checker will overwrite [,4] with pt, but this doesn't matter
   ## because the last column Pr(z) is used by apsrstars() anyway
   ## and the se are pulled from $se.
-  if("orig.var"%in% objects(x)==TRUE) {
+  if("se" %in% objects(x)) {
+    s$se <- x$se
+  } else {
     s$se <- sqrt(diag(x$var))
   }
   return(s)
