@@ -21,23 +21,25 @@ sleepstudy$Wave <- sample(c("A", "B", "C"), nrow(sleepstudy), replace = TRUE)
 
 apsrtable(fm1, fm2, fm3, fm4, lev = 0)
 
-summod <- summary(fm4)
-
-GroupList <- vector("list", length(summod$varcor) * 2)
-nams <- paste0("Group:", names(summod$varcor))
-names(GroupList) <- paste0(rep(nams, times = 2), rep(c(" Effs.", " Var."), 
-                                             each = length(summod$varcor)))
-for(i in 1:length(summod$varcor)){
-  GroupList[[i]] <- paste(names(attr(summod$varcor[[i]], "stddev")), " | ")
-  GroupList[[i + length(summod$varcor)]] <- paste(round(attr(summod$varcor[[i]], "stddev"), 
-                                     digits = 3), collapse = " | ")
-}
-GroupList["Sigma"] <- attr(summod$varcor, "sc")
 
 
-model.info <- list(
-  "$N$"=formatC(as.numeric(summod$devcomp$dims['n']),format="d"),
-  "AIC"=formatC(as.numeric(summod$AICtab),
-                format="f",digits=3),
-  "N Groups"=as.numeric(summod$ngrps), 
-  "Group Names" = names(summod$varcor))
+# summod <- summary(fm4)
+# 
+# GroupList <- vector("list", length(summod$varcor) * 2)
+# nams <- paste0("Group:", names(summod$varcor))
+# names(GroupList) <- paste0(rep(nams, times = 2), rep(c(" Effs.", " Var."), 
+#                                              each = length(summod$varcor)))
+# for(i in 1:length(summod$varcor)){
+#   GroupList[[i]] <- paste(names(attr(summod$varcor[[i]], "stddev")), " | ")
+#   GroupList[[i + length(summod$varcor)]] <- paste(round(attr(summod$varcor[[i]], "stddev"), 
+#                                      digits = 3), collapse = " | ")
+# }
+# GroupList["Sigma"] <- attr(summod$varcor, "sc")
+# 
+# 
+# model.info <- list(
+#   "$N$"=formatC(as.numeric(summod$devcomp$dims['n']),format="d"),
+#   "AIC"=formatC(as.numeric(summod$AICtab),
+#                 format="f",digits=3),
+#   "N Groups"=as.numeric(summod$ngrps), 
+#   "Group Names" = names(summod$varcor))
