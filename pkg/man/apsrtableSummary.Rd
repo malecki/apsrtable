@@ -1,11 +1,16 @@
+\docType{methods}
 \name{apsrtableSummary}
 \alias{apsrtableSummary}
-\alias{apsrtableSummary.gee}
-\alias{apsrtableSummary.lrm}
 \title{Custom summary functions for output tables}
+\usage{
+  apsrtableSummary(object, ...)
+}
 \arguments{
-  \item{x}{A model object to be summarized in a format
+  \item{object}{A model object to be summarized in a format
   suitable for \code{apsrtable} output.}
+
+  \item{...}{further arguments to any custom summary
+  methods}
 }
 \value{
   A \code{summary} representation of a model object,
@@ -52,6 +57,6 @@ apsrtableSummary.gee <- function(x) {
 }
 }
 \author{
-  Michael Malecki <malecki at wustl.edu>
+  Michael Malecki <malecki at gmail.com>
 }
 

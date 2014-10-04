@@ -21,7 +21,22 @@ sleepstudy$Wave <- sample(c("A", "B", "C"), nrow(sleepstudy), replace = TRUE)
 
 apsrtable(fm1, fm2, fm3, fm4, lev = 0)
 
+apsrtable(fm1, fm2, fm3, lev = 0)
 
+
+sleepstudy$DV2 <- ifelse(sleepstudy$Reaction > 285, 1, 0)
+sleepstudy$DV2 <- factor(sleepstudy$DV2)
+
+(gm2 <- glmer(DV2 ~ Days + (1 | Subject), sleepstudy, family = "binomial"))
+
+(gm3 <- glmer(DV2 ~ 0 + (1 | Subject) + (1 | Days), sleepstudy,  family = "binomial"))
+
+(gm3 <- glmer(DV2 ~ 0 + (1 | Subject) + (1 | Days), sleepstudy,  family = "binomial"))
+(gm4 <- glmer(DV2 ~ 0 + (1 | Subject) + (Noise | Days) + (1|Wave), sleepstudy, 
+              family = "binomial"))
+
+
+apsrtable(gm2, gm3, gm4, lev = 0)
 
 # summod <- summary(fm4)
 # 
