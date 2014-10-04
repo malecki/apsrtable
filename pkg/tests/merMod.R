@@ -38,6 +38,16 @@ sleepstudy$DV2 <- factor(sleepstudy$DV2)
 
 apsrtable(gm2, gm3, gm4, lev = 0)
 
+
+## Regular
+
+gmA <- glm(DV2 ~ Days, data = sleepstudy, family = "binomial")
+lmA <- lm(Reaction ~ Days, data = sleepstudy)
+
+apsrtable(gmA)
+apsrtable(lmA)
+
+
 # summod <- summary(fm4)
 # 
 # GroupList <- vector("list", length(summod$varcor) * 2)

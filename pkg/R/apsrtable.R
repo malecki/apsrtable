@@ -285,7 +285,7 @@ apsrtable <- function (...,
         x <- c(x,"%Uncomment the following line and the end one to change figure versions\n%if you are using a full-featured family such as Minion Pro.\n\\figureversion{tabular}\n")
     }
 
-    model.summaries <- lapply(models, .summarize)
+    model.summaries <- lapply(models, .summarize, se = se)
 
     ## Quietly switch the se.note to the pval.note as needed
     if(se=="pval") { se.note <- pval.note }
