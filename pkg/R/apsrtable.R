@@ -259,17 +259,25 @@ apsrtable <- function (...,
     if(float=="longtable") {
         long <- TRUE
         floatspec <- paste("\\begin{",float,"}",colspec,"\n",
-                           ifelse(caption.position=="a",
+                           ifelse(caption.position=="above",
                                   paste("\\caption{", caption,
                                         "}\n\\label{",label,"}",sep=""),
                                   ""),
                            sep="")
+    } else if(float == "sidewaystable"){
+      long <- FALSE
+      floatspec <- paste("\\begin{",float,"}",colspec,"\n",
+                         ifelse(caption.position=="above",
+                                paste("\\caption{", caption,
+                                      "}\n\\label{",label,"}",sep=""),
+                                ""),
+                         sep="")
     } else
     {
         long <- FALSE
         floatspec <- paste(ifelse(!Sweave,
                                   paste("\\begin{",float,"}[!ht]\n",
-                                        ifelse(caption.position=="a",
+                                        ifelse(caption.position=="above",
                                                paste("\\caption{",caption,
                                                      "}\n\\label{",label,
                                                      "}",sep=""),

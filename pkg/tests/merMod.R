@@ -47,7 +47,13 @@ lmA <- lm(Reaction ~ Days, data = sleepstudy)
 apsrtable(gmA)
 apsrtable(lmA)
 
-
+apsrtable(gm2, gm3, gm4, float = "sidewaystable", label= "duh", caption = "please", 
+          notes = list(stars.note, "My note."), 
+          omitcoef=list("distid", 
+                        expression(grep("distid", coefnames, value=TRUE)), 
+                        "year", 
+                        expression(grep("year", coefnames, value = TRUE))), 
+          Sweave=FALSE)
 # summod <- summary(fm4)
 # 
 # GroupList <- vector("list", length(summod$varcor) * 2)
