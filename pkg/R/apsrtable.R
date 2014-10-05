@@ -266,12 +266,15 @@ apsrtable <- function (...,
                            sep="")
     } else if(float == "sidewaystable"){
       long <- FALSE
-      floatspec <- paste("\\begin{",float,"}",colspec,"\n",
-                         ifelse(caption.position=="above",
-                                paste("\\caption{", caption,
-                                      "}\n\\label{",label,"}",sep=""),
-                                ""),
-                         sep="")
+      floatspec <- paste(ifelse(!Sweave,
+                                paste("\\begin{",float,"}[!ht]\n",
+                                      ifelse(caption.position=="above",
+                                             paste("\\caption{",caption,
+                                                   "}\n\\label{",label,
+                                                   "}",sep=""),
+                                             ""),sep=""),
+                                "" ),
+                         paste("\n\\begin{tabular}",colspec,sep=""))
     } else
     {
         long <- FALSE
