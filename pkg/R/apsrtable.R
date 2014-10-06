@@ -259,17 +259,28 @@ apsrtable <- function (...,
     if(float=="longtable") {
         long <- TRUE
         floatspec <- paste("\\begin{",float,"}",colspec,"\n",
-                           ifelse(caption.position=="a",
+                           ifelse(caption.position=="above",
                                   paste("\\caption{", caption,
                                         "}\n\\label{",label,"}",sep=""),
                                   ""),
                            sep="")
+    } else if(float == "sidewaystable"){
+      long <- FALSE
+      floatspec <- paste(ifelse(!Sweave,
+                                paste("\\begin{",float,"}[!ht]\n",
+                                      ifelse(caption.position=="above",
+                                             paste("\\caption{",caption,
+                                                   "}\n\\label{",label,
+                                                   "}",sep=""),
+                                             ""),sep=""),
+                                "" ),
+                         paste("\n\\begin{tabular}",colspec,sep=""))
     } else
     {
         long <- FALSE
         floatspec <- paste(ifelse(!Sweave,
                                   paste("\\begin{",float,"}[!ht]\n",
-                                        ifelse(caption.position=="a",
+                                        ifelse(caption.position=="above",
                                                paste("\\caption{",caption,
                                                      "}\n\\label{",label,
                                                      "}",sep=""),
@@ -285,7 +296,7 @@ apsrtable <- function (...,
         x <- c(x,"%Uncomment the following line and the end one to change figure versions\n%if you are using a full-featured family such as Minion Pro.\n\\figureversion{tabular}\n")
     }
 
-    model.summaries <- lapply(models, .summarize)
+    model.summaries <- lapply(models, .summarize, se = se)
 
     ## Quietly switch the se.note to the pval.note as needed
     if(se=="pval") { se.note <- pval.note }
@@ -339,9 +350,19 @@ apsrtable <- function (...,
         model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
         model.out[var.pos] <- s$coefficients[,1]
         if(lev>0) {
+          if("t value" %in% colnames(s$coefficients)){
+            message("Using t-test with df = 100 to calculate stars.")
+            nctmp <- ncol(s$coefficients)
+            s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
+            colnames(s$coefficients)[nctmp+1] <- "Pr(>|z|)"
             star.out[var.pos] <- apsrStars(s$coefficients,
                                            stars=stars,
                                            lev=lev,signif.stars=TRUE)
+          } else{
+            star.out[var.pos] <- apsrStars(s$coefficients,
+                                           stars=stars,
+                                           lev=lev,signif.stars=TRUE)
+          }
         } else {
             star.out <- rep("", length(coefnames))
         }

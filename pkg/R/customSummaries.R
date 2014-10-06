@@ -2,7 +2,7 @@
 ## where the model-package provides a summary not suitable for apsrtable,
 ## such as z scores instead of pnorms.
 
-.summarize <- function(modelObject) {
+.summarize <- function(modelObject, se = "vcov") {
     ## If an apsrtableSummary exists, use it
     ## Otherwise, use summary.
     s <- try(apsrtableSummary(modelObject), silent=TRUE)
@@ -12,7 +12,7 @@
     if("merMod" %in% is(modelObject)){
         return(s)
     }
-    theSE <- getCustomSE(modelObject)
+    theSE <- suppressWarnings(try(getCustomSE(modelObject), silent = TRUE))
     if(!is.null(theSE) && se != "vcov") {
         ## take first column of summary NOT coef(model)
         ## this already omits NA 'aliased' coefs
@@ -30,6 +30,10 @@
                 2*pnorm(abs(tval),lower.tail=FALSE)
         }
         s$se <- theSE
+    } else {
+      if("lm" %in% is(modelObject)){
+        s$se <- s$coefficients[, 2]
+      }
     }
     if(se == "pval") {
         ## definitely a hack: just replace the column
@@ -98,6 +102,7 @@
 ##' @export
 setGeneric("apsrtableSummary", function(object, ...) {
     standardGeneric("apsrtableSummary") })
+
 
 ##' @rdname customSummaries
 ##' @S3method apsrtableSummary lrm
@@ -269,8 +274,30 @@ apsrtableSummary.lrm <- function (x) {
     s$coefficients <- rbind(coefs,theta)
     return(s)
 }
+##' @rdname customSummaries
+##' @S3method apsrtableSummary rms
+apsrtableSummary.rms <- function(x) {
+  s <- summary.lm(x)
+  newCoef <- coef(s)
+  ## which columns have z scores? (two of them in robust case)
+  zcols <- grep("value",colnames(newCoef))
+  newCoef[,zcols] <- pt(abs(newCoef[,zcols]),df=s$df[2], lower.tail=FALSE)
+  colnames(newCoef)[zcols] <- "Pr(z)"
+  s$coefficients <- newCoef
+  ## put the robust se in $se so that notefunction works automatically
+  ## the se checker will overwrite [,4] with pt, but this doesn't matter
+  ## because the last column Pr(z) is used by apsrstars() anyway
+  ## and the se are pulled from $se.
+  if("se" %in% objects(x)) {
+    s$se <- x$se
+  } else {
+    s$se <- sqrt(diag(x$var))
+  }
+  return(s)
+}
 
 setOldClass("summary.lm")
+setOldClass("summary.rms")
 setOldClass("summary.glm")
 setOldClass("summary.tobit")
 setOldClass("summary.gee")

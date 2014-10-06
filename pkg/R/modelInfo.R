@@ -92,11 +92,24 @@ modelInfo.summary.glm <- function(x) {
 modelInfo.summary.merMod <- function(x) {
   env <- sys.parent()
   digits <- evalq(digits, envir=env)
+  GroupList <- vector("list", length(x$varcor) * 2)
+  nams <- paste0("Group:", names(x$varcor))
+  names(GroupList) <- paste0(rep(nams, times = 2), rep(c(" Effs.", " Var."), 
+                                                       each = length(x$varcor)))
+  for(i in 1:length(x$varcor)){
+    GroupList[[i]] <- paste(names(attr(x$varcor[[i]], "stddev")), collapse = " | ")
+    GroupList[[i + length(x$varcor)]] <- paste(round(attr(x$varcor[[i]], "stddev"), 
+                                                           digits = digits), 
+                                               collapse = " | ")
+  }
+  GroupList["Sigma"] <- formatC(as.numeric(attr(x$varcor, "sc"), digits = digits))
   model.info <- list(
                 "$N$"=formatC(as.numeric(x$devcomp$dims['n']),format="d"),
-                "AIC"=formatC(as.numeric(x$AICtab),
+                "AIC"=formatC(as.numeric(x$AICtab)[1],
                 format="f",digits=digits),
-                "Groups"=as.numeric(x$ngrps))
+                "N Groups" = paste(as.numeric(x$ngrps), collapse = " | "),
+                "Group Names" = paste(names(x$varcor), collapse = " | "))
+  model.info <- append(model.info, GroupList)
   class(model.info) <- "model.info"
   invisible(model.info)
 }
