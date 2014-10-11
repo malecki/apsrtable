@@ -86,8 +86,8 @@ load("/Users/malecki/mrp/malecki/fitted.Rdata")
 \begin{frame}
   \frametitle{Data}
   \begin{itemize}
-  \item combined survey results in the “marriage.data” data.frame
-  \item state-level predictors in “Statelevel” data.frame.
+  \item combined survey results in the ``marriage.data'' data.frame
+  \item state-level predictors in ``Statelevel'' data.frame.
   \item Both loaded by \texttt{data(samesexmarriage)}.
   \end{itemize}
 
@@ -124,9 +124,9 @@ data(spmap.states)
 \begin{frame}
   \frametitle{preparing data}
   \begin{itemize}
-  \item Relies heavily on R's “factor” data type
+  \item Relies heavily on R's ``factor'' data type
   \item Factors have
-    associated “levels” (names for categories) and may be ordered.
+    associated ``levels'' (names for categories) and may be ordered.
   \item categorical variables need to be factors
   \item levels need
     to match between the survey and poststratification
@@ -163,7 +163,7 @@ marriage.data <- within(marriage.data, {
   \begin{itemize}
   \item<1-> Poll data uses four instead of five
     categories for education --- combine the top 2 levels of
-    census education into 1 “Graduated College” level.
+    census education into 1 ``Graduated College'' level.
   \item<1-> Drop any
     states from the census that are not in the survey dataset
   \end{itemize}
@@ -213,7 +213,7 @@ mrp.simple <- mrp(yes.of.all ~ state+age+edu,
   \begin{enumerate}
   \item Cross-classify by main formula creates N-way array,
     computes the $\bar{Y}$, $N_{\mathrm{eff}}$ taking into account
-    any survey weights provided, and “design effect” in that cell.
+    any survey weights provided, and ``design effect'' in that cell.
   \item Collapse N-way survey array into a rectangular matrix,
     using $\bar{Y}$, effective $N$, and the design effects to form for
     each combination of strata (`cell' of the N-way data) a sum of
@@ -255,7 +255,7 @@ xtable(100*poststratify(mrp.simple, ~ edu+age), digits=0)
   \item \emph{MRP} \texttt{spplot} method preserves the same formula
     interface
   \item Extends the \texttt{spplot} method, which uses Lattice as the
-    “high level” graphics language
+    ``high level'' graphics language
   \item Future versions hopefully
     \href{http://spatialanalysis.co.uk/2010/09/27/maps-with-ggplot2/}{\emph{ggplot2}
       maps}
@@ -309,7 +309,7 @@ xtable(100*poststratify(mrp.simple, ~ edu+age), digits=0)
 \begin{frame}[containsverbatim]
   \frametitle{Joining \& Transforming}
   the \texttt{add} argument is a powerful way to add predictors by
-  left-joining (“merging”) other data.frames onto the prepared
+  left-joining (``merging'') other data.frames onto the prepared
   flattened cross-classified data. 
   
   Join on matching keys in same-named columns. The
@@ -386,7 +386,7 @@ mrp.statelevel <- mrp(yes.of.all~
   stratification specification, and merges it onto a map from the
   SpatialPolygonsDataFrame class, provided by the \emph{sp}
   package. Using \emph{maptools}, users can read in their own ESRI
-  “shapefiles” (actually a collection of files, in either a folder or
+  ``shapefiles'' (actually a collection of files, in either a folder or
   a zip archive). Shapefiles are somewhat of a standard for GIS
   applications. As mentioned in the data section above, we have
   included a map read into R from a publicly available
@@ -404,7 +404,7 @@ mrp.statelevel <- mrp(yes.of.all~
   and the included map has the same data in the variable
   `\textsc{state}' (the function default).
 \item[age + edu] conditioning variables in the formula form the rows and columns of a
-  faceted “trellis” or “small multiples” display.
+  faceted ``trellis'' or ``small multiples'' display.
 \item[exclude, subset] both suppress plotting of certain geographic
   units by removing them from the map data; the same effect can be
   achieved with `subset', except `subset' applies to all vars.

@@ -1,0 +1,19 @@
+* installing *source* package 'apsrtable' ...
+** R
+** preparing package for lazy loading
+in method for 'modelInfo' with signature '"summary.merMod"': no definition for class "summary.merMod"
+** help
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:64: unknown macro '\multicolumn'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:106: unknown macro '\begin'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:106: unknown macro '\end'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:107: unknown macro '\begin'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:107: unknown macro '\end'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:140: unknown macro '\input'
+Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:147: unknown macro '\usepackage'
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded
+*** arch - i386
+*** arch - x64
+* DONE (apsrtable)

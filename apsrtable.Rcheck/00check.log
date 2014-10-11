@@ -1,0 +1,138 @@
+* using log directory 'C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck'
+* using R version 3.1.0 (2014-04-10)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* using session charset: ISO8859-1
+* checking for file 'apsrtable/DESCRIPTION' ... OK
+* this is package 'apsrtable' version '0.9'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  vignettes/inst/.Rinstignore
+  vignettes/inst/.install_extras
+These were most likely included in error. See section 'Package
+structure' in the 'Writing R Extensions' manual.
+* checking for portable file names ... OK
+* checking whether package 'apsrtable' can be installed ... WARNING
+Found the following significant warnings:
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:64: unknown macro '\multicolumn'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:106: unknown macro '\begin'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:106: unknown macro '\end'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:107: unknown macro '\begin'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:107: unknown macro '\end'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:140: unknown macro '\input'
+  Warning: C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00_pkg_src/apsrtable/man/apsrtable.Rd:147: unknown macro '\usepackage'
+See 'C:/Users/Jared/GitHub/apsrtable/apsrtable.Rcheck/00install.out' for details.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking dependencies in R code ... NOTE
+package 'methods' is used but not declared
+See the information on DESCRIPTION files in the chapter 'Creating R
+packages' of the 'Writing R Extensions' manual.
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+apsrtableSummary.lrm: no visible binding for global variable 'est.exp'
+pval.note: no visible binding for global variable 'se'
+se.note: no visible binding for global variable 'se'
+se.note: no visible binding for global variable 'nmodels'
+stars.note: no visible binding for global variable 'lev'
+* checking Rd files ... WARNING
+prepare_Rd: apsrtable.Rd:64: unknown macro '\multicolumn'
+prepare_Rd: apsrtable.Rd:106: unknown macro '\begin'
+prepare_Rd: apsrtable.Rd:106: unknown macro '\end'
+prepare_Rd: apsrtable.Rd:107: unknown macro '\begin'
+prepare_Rd: apsrtable.Rd:107: unknown macro '\end'
+prepare_Rd: apsrtable.Rd:140: unknown macro '\input'
+prepare_Rd: apsrtable.Rd:147: unknown macro '\usepackage'
+* checking Rd metadata ... WARNING
+Rd files with duplicated name 'apsrtableSummary':
+  'apsrtableSummary.Rd' 'customSummaries.Rd'
+Rd files with duplicated name 'se.note':
+  'notefunctions.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'apsrtableSummary':
+  'apsrtableSummary.Rd' 'customSummaries.Rd'
+Rd files with duplicated alias 'modelInfo':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.clogit-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.coxph-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.gee-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.glm-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.lm-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.lrm-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.negbin-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.svyglm-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'modelInfo,summary.tobit-method':
+  'modelInfo.Rd' 'se.note.Rd'
+Rd files with duplicated alias 'se.note':
+  'notefunctions.Rd' 'se.note.Rd'
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'as.matrix.VarCorr'
+  'varc' 'useScale' 'digits'
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See the chapter 'Writing R documentation files' in the 'Writing R
+Extensions' manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking files in 'vignettes' ... OK
+* checking examples ... ERROR
+Running examples in 'apsrtable-Ex.R' failed
+The error most likely occurred in:
+
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: se.note
+> ### Title: Model fit and diagnostic functions for output
+> ### Aliases: modelInfo modelInfo,summary.clogit-method
+> ###   modelInfo,summary.coxph-method modelInfo,summary.gee-method
+> ###   modelInfo,summary.glm-method modelInfo,summary.lm-method
+> ###   modelInfo,summary.lrm-method modelInfo,summary.negbin-method
+> ###   modelInfo,summary.svyglm-method modelInfo,summary.tobit-method
+> ###   se.note
+> 
+> ### ** Examples
+> 
+> setMethod("modelInfo", "summary.lm", function(x) {
++   env <- sys.parent()
++   digits <- evalq(digits, env)
++   model.info <- list(
++                      "$N$"=formatC(sum(x$df[1:2]),format="d"),
++                      "Resid. sd" = formatC(x$sigma,format="f",digits=digits))
++   class(model.info) <- "model.info"
++   return(model.info)
++ } )
+Error in setMethod("modelInfo", "summary.lm", function(x) { : 
+  no existing definition for function 'modelInfo'
+Execution halted
