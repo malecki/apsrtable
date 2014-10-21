@@ -1,4 +1,25 @@
-
+##' Custom summary functions for apsrtable stars
+##'
+##' Provides a programmatic way to include stars in tables
+##'
+##' @param x a matrix of coefficients
+##' @param digits the number of digits to display
+##' @param signif.stars the option for how to map stars onto p-values
+##' @param signif.legend the legend for p-value mapping
+##' @param cs.ind unknown
+##' @param zap.ind unknown
+##' @param dig.tst testing the number of digits
+##' @param tst.ind results for number of digits
+##' @param P.values which column are the p-values in the matrix of coefficients?
+##' @param has.Pvalue are p-values present, true or false
+##' @param eps.Pvalue unsure
+##' @param na.print what character should represent NA
+##' @param stars should stars be shown?
+##' @param lev what is the significance level for p-values, numeric
+##' @param ... other options passed to the function
+##' @return A \code{summary} representation of a model object,
+##' probably derived  from the object's own \code{summary} method.
+##' @author Michael Malecki <malecki at gmail.com>
 apsrStars <- function (x, digits = max(3, getOption("digits") - 2),
                        signif.stars = getOption("show.signif.stars"),
                        signif.legend = signif.stars,

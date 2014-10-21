@@ -15,17 +15,17 @@ apsrtableSummary(object, ...)
 
 apsrtableSummary(object, ...)
 
-apsrtableSummary.lrm(x)
+apsrtableSummary.lrm(object)
 
-apsrtableSummary.polr(x)
+apsrtableSummary.polr(object)
 
-apsrtableSummary.gee(x)
+apsrtableSummary.gee(object)
 
-apsrtableSummary.clogit(x)
+apsrtableSummary.clogit(object)
 
-apsrtableSummary.negbin(x)
+apsrtableSummary.negbin(object)
 
-apsrtableSummary.rms(x)
+apsrtableSummary.rms(object)
 }
 \arguments{
 \item{object}{A model object to be summarized in a format suitable for
@@ -54,12 +54,13 @@ produce a suitable \code{summary} object.
 Ideally, the former is a stopgap for the latter.
 }
 \examples{
+\dontrun{
 ### summary.gee produces z scores but not Pr(z). This converts the relevant columns
 ### to Pr(z) so that apsrstars() works on it, and places the vector of robust se's in
 ### an $se position which apsrtable expects.
 
-apsrtableSummary.gee <- function(x) {
-  s <- summary(x)
+apsrtableSummary.gee <- function(object) {
+  s <- summary(object)
   newCoef <- coef(s)
   ## which columns have z scores? (two of them in robust case)
   zcols <- grep("z",colnames(newCoef))
@@ -70,10 +71,11 @@ apsrtableSummary.gee <- function(x) {
   ## the se checker will overwrite [,4] with pt, but this doesn't matter
   ## because the last column Pr(z) is used by apsrstars() anyway
   ## and the se are pulled from $se.
-  if( class(x) == "gee.robust") {
+  if( class(object) == "gee.robust") {
     s$se <- coef(s)[,4]
   }
   return(s)
+}
 }
 }
 \author{

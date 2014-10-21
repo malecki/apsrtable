@@ -61,7 +61,7 @@ decoration entirely by specifying \code{lev=0}. Default=.05.}
 \item{align}{How should columns be aligned in the output? Model summaries
 are always decimal-aligned using dcolumn (and therefore also set in math
 mode), but dcolumn also provides for decimal-point centering. Model names
-are set in \code{\multicolumn} spans with alignment given here, as are
+are set in \dQuote{\special{\multicolumn}} spans with alignment given here, as are
 model terms (leftmost column of table). Default = \dQuote{left}.}
 
 \item{order}{Determines the order in which terms (rows) are included in the
@@ -103,8 +103,8 @@ columns. Default=\dQuote{center}}
 \code{em}) to insert between each model column(s). Intended mainly to
 separate models from each other when \code{coef.rows=1}. Default=NULL}
 
-\item{Sweave}{Toggle whether to include \code{\begin{table}...\end{table}},
-label, and caption, or only the \code{\begin{tabular} ... \end{tabular}}.
+\item{Sweave}{Toggle whether to include \dQuote{\special{\begin{table}...\end{table}}},
+label, and caption, or only the \dQuote{\special{\begin{tabular} ... \end{tabular}}}.
 When called from within an \code{Sweave} document one would typically write
 such elements in the \dQuote{documentation} (latex-part) rather than inside
 the code chunk. When called from an \code{Sweave} document, make sure to
@@ -137,14 +137,14 @@ alternative float environments, but should work with the standard
 }
 \value{
 A character vector containing lines of latex code. It can be
-written out using \code{writeLines} for inclusion via \code{\input{}} in
+written out using \code{writeLines} for inclusion via \dQuote{\special{\input}} in
 latex documents.
 }
 \description{
 Produce well-formatted LaTeX tables of multiple models side-by-side.
 }
 \details{
-*** Requires \code{\usepackage{dcolumn}} in Latex/Sweave preamble. ***
+*** Requires \dQuote{\special{\usepackage{dcolumn}}} in Latex/Sweave preamble. ***
 
 Given one or several model objects of various types, \code{apsrtable()}
 will produce side-by-side output in well-formatted LaTeX using either

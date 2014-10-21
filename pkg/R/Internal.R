@@ -45,6 +45,10 @@ pfround <- function (x, digits) {
 ##' Extract VarCorr as a matrix from a mer-like object
 ##'
 ##' borrowed from package arm
+##' @param varc a VarCorr matrix from a merMod
+##' @param useScale Rescale the matrix?
+##' @param digits the number of digits to round to
+##' @keywords internal
 as.matrix.VarCorr <- function (varc, useScale, digits){
     ## VarCorr function for lmer objects, altered as follows:
     ##   1.  specify rounding

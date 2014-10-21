@@ -33,11 +33,14 @@
 ##' e.g., the \eqn{N} -- are matched by name, exactly like the model
 ##' coefficients (indeed, the same functions aggregate terms and order across
 ##' models.)
+##' @export
+##' @docType methods
+##' @rdname modelInfo-methods
 ##' @author Michael Malecki <malecki at wustl.edu>
 ##' @seealso \link[base]{sys.frame}
 ##' @examples
 ##'
-##'
+##'\dontrun{
 ##' setMethod("modelInfo", "summary.lm", function(x) {
 ##'   env <- sys.parent()
 ##'   digits <- evalq(digits, env)
@@ -49,17 +52,19 @@
 ##' } )
 ##'
 ##' example(apsrtable)
-##'
-##'
-##' ### Switch back to the default
+##' ## Switch back to the default
 ##' setMethod("modelInfo", "summary.lm", apsrtable:::modelInfo.summary.lm)
-##' \dontrun{
 ##' example(apsrtable)
+##'
 ##' }
-setGeneric("modelInfo", function(x) standardGeneric("modelInfo") )
+setGeneric("modelInfo", function(x) {
+             standardGeneric("modelInfo")
+})
 
 
-modelInfo.summary.lm <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.lm,ANY-method
+setMethod("modelInfo", "summary.lm", function(x) {
   env <- sys.parent()
   digits <- evalq(digits, envir=env)
   model.info <- list(
@@ -69,9 +74,11 @@ modelInfo.summary.lm <- function(x) {
                      "Resid. sd" = formatC(x$sigma,format="f",digits=digits))
   class(model.info) <- "model.info"
   invisible(model.info)
-}
+})
 
-modelInfo.summary.glm <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.glm,ANY-method
+setMethod("modelInfo", "summary.glm", function(x) {
   env <- sys.parent()
   digits <- evalq(digits, envir=env)
   model.info <- list(
@@ -87,9 +94,11 @@ modelInfo.summary.glm <- function(x) {
                          format="f",digits=digits))
   class(model.info) <- "model.info"
   invisible(model.info)
-}
+})
 
-modelInfo.summary.merMod <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.merMod,ANY-method
+setMethod("modelInfo", "summary.merMod", function(x) {
   env <- sys.parent()
   digits <- evalq(digits, envir=env)
   GroupList <- vector("list", length(x$varcor) * 2)
@@ -112,14 +121,16 @@ modelInfo.summary.merMod <- function(x) {
   model.info <- append(model.info, GroupList)
   class(model.info) <- "model.info"
   invisible(model.info)
-}
+})
 
 
 ## 2009-02-25 mjm
 ## modelInfo request from Antonio Ramos for AER Tobit function
 ## Should be similar for 'survreg' objects, but without (necessarily)
 ## censoring info..
-"modelInfo.summary.tobit" <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.tobit,ANY-method
+setMethod("modelInfo", "summary.tobit", function(x) {
  env <- sys.parent()
  digits <- evalq(digits, envir=env)
  model.info <- list(
@@ -134,17 +145,22 @@ formatC(x$loglik[2],format="f",digits=digits),
                     )
  class(model.info) <- "model.info"
  return(model.info)
-}
-"modelInfo.summary.gee" <- function(x) {
+})
+
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.gee,ANY-method
+setMethod("modelInfo", "summary.gee", function(x) {
  env <- sys.parent()
  digits <- evalq(digits, envir=env)
  model.info <- list(" " = ""
                     )
  class(model.info) <- "model.info"
  return(model.info)
-}
+})
 
-"modelInfo.summary.coxph" <- function (x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.coxph,ANY-method
+setMethod("modelInfo", "summary.coxph", function(x) {
        env <- sys.parent()
        digits <- evalq(digits, envir=env)
        model.info <- list()
@@ -158,9 +174,11 @@ formatC(x$loglik[2],format="f",digits=digits),
        model.info[["$R^2$"]] <- sprintf("%s (Max %s)", rsq, maxrsq)
        class(model.info) <- "model.info"
        invisible(model.info)
-}
+})
 
-modelInfo.summary.polr <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.polr,ANY-method
+setMethod("modelInfo", "summary.polr", function(x) {
     env <- sys.parent()
     digits<- evalq(digits, envir=env)
 
@@ -168,10 +186,11 @@ modelInfo.summary.polr <- function(x) {
                        AIC=format(x$deviance + 2 * x$edf, nsmall = 2L))
     class(model.info) <- "model.info"
     invisible(model.info)
-}
+})
 
-
-"modelInfo.summary.lrm" <- function(x) {
+##' @rdname modelInfo-methods
+##' @aliases modelInfo,summary.lrm,ANY-method
+setMethod("modelInfo", "summary.lrm", function(x) {
   env <- sys.parent()
   digits<- evalq(digits, envir=env)
   x <- as.numeric(x$modelinfo)
@@ -197,17 +216,4 @@ modelInfo.summary.polr <- function(x) {
            "Brier" = formatC(x[11],format="f",digits=digits))
   class(model.info) <- "model.info"
   invisible(model.info)
-}
-
-
-setMethod("modelInfo", "summary.lm", modelInfo.summary.lm )
-setMethod("modelInfo","summary.glm", modelInfo.summary.glm )
-setMethod("modelInfo","summary.tobit", modelInfo.summary.tobit)
-setMethod("modelInfo","summary.gee",modelInfo.summary.gee)
-setMethod("modelInfo","summary.coxph",modelInfo.summary.coxph)
-setMethod("modelInfo","summary.negbin",modelInfo.summary.glm)
-setMethod("modelInfo", "summary.lrm", modelInfo.summary.lrm )
-setMethod("modelInfo", "summary.svyglm",
-          apsrtable:::modelInfo.summary.glm )
-setMethod("modelInfo","summary.polr", modelInfo.summary.polr)
-setMethod("modelInfo","summary.merMod", modelInfo.summary.merMod)
+})

@@ -1,7 +1,4 @@
 .Rproj.user
 .Rhistory
 .RData
-<<<<<<< HEAD
-*.Rproj
-=======
->>>>>>> dev
+pkg/apsrtable.Rcheck
