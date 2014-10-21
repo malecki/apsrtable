@@ -5,7 +5,15 @@
 \usage{
 \method{as.matrix}{VarCorr}(varc, useScale, digits)
 }
+\arguments{
+\item{varc}{a VarCorr matrix from a merMod}
+
+\item{useScale}{Rescale the matrix?}
+
+\item{digits}{the number of digits to round to}
+}
 \description{
 borrowed from package arm
 }
+\keyword{internal}
 

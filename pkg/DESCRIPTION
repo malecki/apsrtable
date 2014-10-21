@@ -7,7 +7,8 @@ Maintainer: Michael Malecki <malecki@wustl.edu>
 Depends:
     R (>= 2.14.0)
 Suggests:
-    testthat
+    testthat,
+    lme4
 Description: Formats latex tables from one or more model objects side-by-side
     with standard errors below, not unlike tables found in such journals as the
     American Political Science Review.

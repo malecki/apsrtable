@@ -1,4 +1,12 @@
-
+##' Custom summary functions for apsrtable stars
+##'
+##' Provides a programmatic way to include stars in tables
+##'
+##' @param x a matrix of coefficients
+##' @param ... further arguments to any custom summary methods
+##' @return A \code{summary} representation of a model object,
+##' probably derived  from the object's own \code{summary} method.
+##' @author Michael Malecki <malecki at gmail.com>
 apsrStars <- function (x, digits = max(3, getOption("digits") - 2),
                        signif.stars = getOption("show.signif.stars"),
                        signif.legend = signif.stars,

@@ -76,8 +76,8 @@
 ##' ### to Pr(z) so that apsrstars() works on it, and places the vector of robust se's in
 ##' ### an $se position which apsrtable expects.
 ##'
-##' apsrtableSummary.gee <- function(x) {
-##'   s <- summary(x)
+##' apsrtableSummary.gee <- function(object) {
+##'   s <- summary(object)
 ##'   newCoef <- coef(s)
 ##'   ## which columns have z scores? (two of them in robust case)
 ##'   zcols <- grep("z",colnames(newCoef))
@@ -88,7 +88,7 @@
 ##'   ## the se checker will overwrite [,4] with pt, but this doesn't matter
 ##'   ## because the last column Pr(z) is used by apsrstars() anyway
 ##'   ## and the se are pulled from $se.
-##'   if( class(x) == "gee.robust") {
+##'   if( class(object) == "gee.robust") {
 ##'     s$se <- coef(s)[,4]
 ##'   }
 ##'   return(s)
@@ -105,8 +105,8 @@ setGeneric("apsrtableSummary", function(object, ...) {
 
 
 ##' @rdname customSummaries
-##' @export apsrtableSummary lrm
-apsrtableSummary.lrm <- function (x) {
+##' @export
+apsrtableSummary.lrm <- function (object) {
     ## Req by Solomon Messing. This fxn is based on print.lrm, which seems
     ## to contain everything needed for table and modelinfo.
     digits <- 4
@@ -119,54 +119,54 @@ apsrtableSummary.lrm <- function (x) {
     rn <- function(x, d) format(round(as.single(x), d))
 
     ##cat("\n")
-    if (x$fail) {
+    if (object$fail) {
         cat("Model Did Not Converge\n")
         return()
     }
     ##cat("Logistic Regression Model\n\n")
-    ##sdput(x$call)
+    ##sdput(object$call)
     ##cat("\n\nFrequencies of Responses\n")
-    ##print(x$freq)
-    if (length(x$sumwty)) {
+    ##print(object$freq)
+    if (length(object$sumwty)) {
         ##cat("\n\nSum of Weights by Response Category\n")
-        ##print(x$sumwty)
+        ##print(object$sumwty)
     }
     ##cat("\n")
-    if (!is.null(x$nmiss)) {
+    if (!is.null(object$nmiss)) {
         ##cat("Frequencies of Missing Values Due to Each Variable\n")
-        ##print(x$nmiss)
+        ##print(object$nmiss)
         ##cat("\n")
     }
-    else if (!is.null(x$na.action))
-        ##naprint(x$na.action)
-        ns <- x$non.slopes
-    nstrata <- x$nstrata
+    else if (!is.null(object$na.action))
+        ##naprint(object$na.action)
+        ns <- object$non.slopes
+    nstrata <- object$nstrata
     if (!length(nstrata))
         nstrata <- 1
-    pm <- x$penalty.matrix
+    pm <- object$penalty.matrix
     if (length(pm)) {
         psc <- if (length(pm) == 1)
             sqrt(pm)
         else sqrt(diag(pm))
         penalty.scale <- c(rep(0, ns), psc)
-        cof <- matrix(x$coef[-(1:ns)], ncol = 1)
+        cof <- matrix(object$coef[-(1:ns)], ncol = 1)
         ##cat("Penalty factors:\n\n")
-        ##print(as.data.frame(x$penalty, row.names = ""))
+        ##print(as.data.frame(object$penalty, row.names = ""))
         ##cat("\nFinal penalty on -2 log L:", rn(t(cof) %*% pm %*%
         ##    cof, 2), "\n\n")
     }
-    vv <- diag(x$var)
-    cof <- x$coef
+    vv <- diag(object$var)
+    cof <- object$coef
     if (strata.coefs) {
-        cof <- c(cof, x$strata.coef)
-        vv <- c(vv, x$Varcov(x, which = "strata.var.diag"))
+        cof <- c(cof, object$strata.coef)
+        vv <- c(vv, object$Varcov(object, which = "strata.var.diag"))
         if (length(pm))
-            penalty.scale <- c(penalty.scale, rep(NA, x$nstrat -
+            penalty.scale <- c(penalty.scale, rep(NA, object$nstrat -
                                                   1))
     }
-    score.there <- nstrata == 1 && (length(x$est) < length(x$coef) -
+    score.there <- nstrata == 1 && (length(object$est) < length(object$coef) -
                    ns)
-    stats <- x$stats
+    stats <- object$stats
     stats[2] <- signif(stats[2], 1)
     stats[3] <- round(stats[3], 2)
     stats[4] <- round(stats[4], 2)
@@ -179,11 +179,11 @@ apsrtableSummary.lrm <- function (x) {
         stats[10] <- round(stats[10], 3)
         if (length(stats) > 10) {
             stats[11] <- round(stats[11], 3)
-            if (length(x$weights))
+            if (length(object$weights))
                 stats[12] <- round(stats[12], 3)
         }
     }
-    else stats <- c(stats, Strata = x$nstrat)
+    else stats <- c(stats, Strata = object$nstrat)
 
     res <- list()
     res$modelinfo <- stats
@@ -200,11 +200,11 @@ apsrtableSummary.lrm <- function (x) {
     ##print(stats, quote = FALSE)
     ##cat("\n")
     if (score.there) {
-        q <- (1:length(cof))[-est.exp]
+        q <- (1:length(cof))[-'est.exp'] #TODO: Check this works
         if (length(q) == 1)
-            vv <- x$var[q, q]
-        else vv <- diag(x$var[q, q])
-        z <- x$u[q]/sqrt(vv)
+            vv <- object$var[q, q]
+        else vv <- diag(object$var[q, q])
+        z <- object$u[q]/sqrt(vv)
         stats <- cbind(z, (1 - pchisq(z^2, 1)))
 
         dimnames(stats) <- list(names(cof[q]), c("Score Z", "P"))
@@ -219,11 +219,11 @@ apsrtableSummary.lrm <- function (x) {
 
 
 ##' @rdname customSummaries
-##' @export apsrtableSummary polr
-"apsrtableSummary.polr" <- function (x) {
+##' @export
+"apsrtableSummary.polr" <- function (object) {
     ## Added support for MASS::polr
     ## mjm 2012-05-20
-    s <- summary(x)
+    s <- summary(object)
     newCoef <- coef(s)
     newCoef <- cbind(newCoef, pt(abs(coef(s)[,3]),
                                  df=s$n-s$edf-1,
@@ -235,9 +235,9 @@ apsrtableSummary.lrm <- function (x) {
 }
 
 ##' @rdname customSummaries
-##' @export apsrtableSummary gee
-"apsrtableSummary.gee" <- function(x) {
-    s <- summary(x)
+##' @export
+"apsrtableSummary.gee" <- function(object) {
+    s <- summary(object)
     newCoef <- coef(s)
     ## which columns have z scores? (two of them in robust case)
     zcols <- grep("z",colnames(newCoef))
@@ -248,24 +248,24 @@ apsrtableSummary.lrm <- function (x) {
     ## the se checker will overwrite [,4] with pt, but this doesn't matter
     ## because the last column Pr(z) is used by apsrstars() anyway
     ## and the se are pulled from $se.
-    if( class(x)[1] == "gee.robust") {
+    if( class(object)[1] == "gee.robust") {
         s$se <- coef(s)[,4]
     }
     return(s)
 }
 
 ##' @rdname customSummaries
-##' @export apsrtableSummary clogit
-"apsrtableSummary.clogit" <- apsrtableSummary.coxph <- function (x) {
-    s <- summary(x)
+##' @export
+"apsrtableSummary.clogit" <- apsrtableSummary.coxph <- function (object) {
+    s <- summary(object)
     if("robust se" %in% colnames(coef(s))) s$se <- coef(s)[,"robust se"]
     s$coefficients <- coef(s)[,c("coef","se(coef)", "Pr(>|z|)")]
     return(s)
 }
 ##' @rdname customSummaries
-##' @export apsrtableSummary negbin
-"apsrtableSummary.negbin" <- function (x) {
-    s <- summary(x)
+##' @export
+"apsrtableSummary.negbin" <- function (object) {
+    s <- summary(object)
     coefs <- coef(s)
     theta <- matrix(c(s$theta, s$SE.theta,NA,NA),1,4)
     theta[,3] <- theta[,1]/theta[,2] ;
@@ -275,9 +275,9 @@ apsrtableSummary.lrm <- function (x) {
     return(s)
 }
 ##' @rdname customSummaries
-##' @export apsrtableSummary rms
-apsrtableSummary.rms <- function(x) {
-  s <- summary.lm(x)
+##' @export
+"apsrtableSummary.rms" <- function(object) {
+  s <- summary.lm(object)
   newCoef <- coef(s)
   ## which columns have z scores? (two of them in robust case)
   zcols <- grep("value",colnames(newCoef))
@@ -288,10 +288,10 @@ apsrtableSummary.rms <- function(x) {
   ## the se checker will overwrite [,4] with pt, but this doesn't matter
   ## because the last column Pr(z) is used by apsrstars() anyway
   ## and the se are pulled from $se.
-  if("se" %in% objects(x)) {
-    s$se <- x$se
+  if("se" %in% objects(object)) {
+    s$se <- object$se
   } else {
-    s$se <- sqrt(diag(x$var))
+    s$se <- sqrt(diag(object$var))
   }
   return(s)
 }
