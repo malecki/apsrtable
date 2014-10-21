@@ -217,16 +217,3 @@ setMethod("modelInfo", "summary.lrm", function(x) {
   class(model.info) <- "model.info"
   invisible(model.info)
 })
-
-
-# setMethod("modelInfo", "summary.lm", modelInfo.summary.lm )
-# setMethod("modelInfo","summary.glm", modelInfo.summary.glm )
-# setMethod("modelInfo","summary.tobit", modelInfo.summary.tobit)
-# setMethod("modelInfo","summary.gee",modelInfo.summary.gee)
-# setMethod("modelInfo","summary.coxph",modelInfo.summary.coxph)
-# setMethod("modelInfo","summary.negbin",modelInfo.summary.glm)
-# setMethod("modelInfo", "summary.lrm", modelInfo.summary.lrm )
-# setMethod("modelInfo", "summary.svyglm",
-#           apsrtable:::modelInfo.summary.glm )
-# setMethod("modelInfo","summary.polr", modelInfo.summary.polr)
-# setMethod("modelInfo","summary.merMod", modelInfo.summary.merMod)

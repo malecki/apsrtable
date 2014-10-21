@@ -14,7 +14,33 @@ apsrStars(x, digits = max(3, getOption("digits") - 2),
 \arguments{
 \item{x}{a matrix of coefficients}
 
-\item{...}{further arguments to any custom summary methods}
+\item{digits}{the number of digits to display}
+
+\item{signif.stars}{the option for how to map stars onto p-values}
+
+\item{signif.legend}{the legend for p-value mapping}
+
+\item{dig.tst}{testing the number of digits}
+
+\item{cs.ind}{unknown}
+
+\item{tst.ind}{results for number of digits}
+
+\item{zap.ind}{unknown}
+
+\item{P.values}{which column are the p-values in the matrix of coefficients?}
+
+\item{has.Pvalue}{are p-values present, true or false}
+
+\item{eps.Pvalue}{unsure}
+
+\item{na.print}{what character should represent NA}
+
+\item{stars}{should stars be shown?}
+
+\item{lev}{what is the significance level for p-values, numeric}
+
+\item{...}{other options passed to the function}
 }
 \value{
 A \code{summary} representation of a model object,
