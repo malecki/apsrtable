@@ -1,9 +1,0 @@
-apsrtable               APSR-style latex tables with multiple models
-apsrtableSummary        Custom summary functions for output tables
-apsrtableSummary        Custom summary functions for output tables
-as.matrix.VarCorr       Extract VarCorr as a matrix from a mer-like
-                        object
-getCustomSE             getCustomSE
-modelInfo               Model fit and diagnostic functions for output
-se.note                 Table notes
-se.note                 Model fit and diagnostic functions for output

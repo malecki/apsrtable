@@ -54,6 +54,7 @@ produce a suitable \code{summary} object.
 Ideally, the former is a stopgap for the latter.
 }
 \examples{
+\dontrun{
 ### summary.gee produces z scores but not Pr(z). This converts the relevant columns
 ### to Pr(z) so that apsrstars() works on it, and places the vector of robust se's in
 ### an $se position which apsrtable expects.
@@ -74,6 +75,7 @@ apsrtableSummary.gee <- function(x) {
     s$se <- coef(s)[,4]
   }
   return(s)
+}
 }
 }
 \author{

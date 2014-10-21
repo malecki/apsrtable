@@ -71,7 +71,7 @@
 ##' @author Michael Malecki <malecki at gmail.com>
 ##' @export
 ##' @examples
-##'
+##' \dontrun{
 ##' ### summary.gee produces z scores but not Pr(z). This converts the relevant columns
 ##' ### to Pr(z) so that apsrstars() works on it, and places the vector of robust se's in
 ##' ### an $se position which apsrtable expects.
@@ -93,7 +93,7 @@
 ##'   }
 ##'   return(s)
 ##' }
-##'
+##'}
 "apsrtableSummary" <- function(object, ...) {
     UseMethod("apsrtableSummary") }
 
@@ -105,7 +105,7 @@ setGeneric("apsrtableSummary", function(object, ...) {
 
 
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary lrm
+##' @export apsrtableSummary lrm
 apsrtableSummary.lrm <- function (x) {
     ## Req by Solomon Messing. This fxn is based on print.lrm, which seems
     ## to contain everything needed for table and modelinfo.
@@ -219,7 +219,7 @@ apsrtableSummary.lrm <- function (x) {
 
 
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary polr
+##' @export apsrtableSummary polr
 "apsrtableSummary.polr" <- function (x) {
     ## Added support for MASS::polr
     ## mjm 2012-05-20
@@ -235,7 +235,7 @@ apsrtableSummary.lrm <- function (x) {
 }
 
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary gee
+##' @export apsrtableSummary gee
 "apsrtableSummary.gee" <- function(x) {
     s <- summary(x)
     newCoef <- coef(s)
@@ -255,7 +255,7 @@ apsrtableSummary.lrm <- function (x) {
 }
 
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary clogit
+##' @export apsrtableSummary clogit
 "apsrtableSummary.clogit" <- apsrtableSummary.coxph <- function (x) {
     s <- summary(x)
     if("robust se" %in% colnames(coef(s))) s$se <- coef(s)[,"robust se"]
@@ -263,7 +263,7 @@ apsrtableSummary.lrm <- function (x) {
     return(s)
 }
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary negbin
+##' @export apsrtableSummary negbin
 "apsrtableSummary.negbin" <- function (x) {
     s <- summary(x)
     coefs <- coef(s)
@@ -275,7 +275,7 @@ apsrtableSummary.lrm <- function (x) {
     return(s)
 }
 ##' @rdname customSummaries
-##' @S3method apsrtableSummary rms
+##' @export apsrtableSummary rms
 apsrtableSummary.rms <- function(x) {
   s <- summary.lm(x)
   newCoef <- coef(s)

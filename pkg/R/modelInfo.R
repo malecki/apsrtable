@@ -33,6 +33,7 @@
 ##' e.g., the \eqn{N} -- are matched by name, exactly like the model
 ##' coefficients (indeed, the same functions aggregate terms and order across
 ##' models.)
+##' @export modelInfo
 ##' @author Michael Malecki <malecki at wustl.edu>
 ##' @seealso \link[base]{sys.frame}
 ##' @examples
@@ -55,8 +56,10 @@
 ##'
 ##' }
 ##'
-
-setGeneric("modelInfo", function(x) standardGeneric("modelInfo") )
+modelInfo <- function(x){
+  UseMethod("modelInfo")
+}
+# setGeneric("modelInfo", function(x) standardGeneric("modelInfo") )
 
 modelInfo.summary.lm <- function(x) {
   env <- sys.parent()
