@@ -1,4 +1,5 @@
 apsrtable
 =========
 
-[![Build Status](https://travis-ci.org/<USERNAME>/<REPO>.png?branch=master)](https://travis-ci.org/<USERNAME>/<REPO>)
+A package for making beautiful model summary tables like those found in the 
+American Political Science Review.
