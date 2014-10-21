@@ -12,10 +12,10 @@ group <- gl(2, 10, 20, labels = c("Ctl","Trt"))
 weight <- c(ctl, trt)
 lm1 <- lm(weight ~ group)
 lm2 <- lm(weight ~ group - 1) # omitting intercept
-
+glm1 <- glm(weight ~ group, family = gaussian)
 
 apsrtable(lm1, lm2)
-
+apsrtable(lm1, lm2, glm1)
 
 # from ?glm
 
@@ -23,8 +23,13 @@ counts <- c(18,17,15,20,10,20,25,13,12)
 outcome <- gl(3,1,9)
 treatment <- gl(3,3)
 print(d.AD <- data.frame(treatment, outcome, counts))
-glm.D93 <- glm(counts ~ outcome + treatment, family = poisson())
-anova(glm.D93)
-summary(glm.D93)
+glm2 <- glm(counts ~ outcome + treatment, family = poisson())
+
+apsrtable(glm2)
+
+
+
+
+
 
 
