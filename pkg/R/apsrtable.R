@@ -343,15 +343,14 @@ apsrtable <- function (...,
     } else {
         coefnames[incl] <- sanitize(coefnames[incl])
     }
-    "%w/o%" <- function(x, y) x[!x %in% y] #--  x without y
+     "%w/o%" <- function(x, y) x[!x %in% y] #--  x without y
 
     out.table <- lapply(model.summaries, function(s){
         var.pos <- attr(s,"var.pos")
         model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
         model.out[var.pos] <- s$coefficients[,1]
         if(lev>0) {
-          if("t value" %in% colnames(s$coefficients) & 
-               "Pr(>|t|)" %w/o% colnames(s$coefficents)){
+          if("t value" %in% colnames(s$coefficients)){
             message("Using t-test with df = 100 to calculate stars.")
             nctmp <- ncol(s$coefficients)
             s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
