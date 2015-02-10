@@ -349,15 +349,21 @@ apsrtable <- function (...,
         var.pos <- attr(s,"var.pos")
         model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
         model.out[var.pos] <- s$coefficients[,1]
-        if(lev>0) {
+        if(lev > 0) {
           if("t value" %in% colnames(s$coefficients)){
-            message("Using t-test with df = 100 to calculate stars.")
             nctmp <- ncol(s$coefficients)
-            s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
-            colnames(s$coefficients)[nctmp+1] <- "Pr(>|z|)"
-            star.out[var.pos] <- apsrStars(s$coefficients,
-                                           stars=stars,
-                                           lev=lev,signif.stars=TRUE)
+            if(nctmp == 4){
+              star.out[var.pos] <- apsrStars(s$coefficients,
+                                             stars=stars,
+                                             lev=lev,signif.stars=TRUE)
+            } else if(nctmp == 3){
+              message("Using t-test with df = 100 to calculate stars.")
+              s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
+              colnames(s$coefficients)[nctmp+1] <- "Pr(>|z|)"
+              star.out[var.pos] <- apsrStars(s$coefficients,
+                                             stars=stars,
+                                             lev=lev,signif.stars=TRUE)
+             }
           } else{
             star.out[var.pos] <- apsrStars(s$coefficients,
                                            stars=stars,
