@@ -1,27 +1,27 @@
 # # Test merMod
 # # 
-# library(lme4)
+library(lme4)
+
+(fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy))
+summary(fm1)# (with its own print method)
+
+apsrtable(fm1)
 # 
-# (fm1 <- lmer(Reaction ~ Days + (Days | Subject), sleepstudy))
-# summary(fm1)# (with its own print method)
-# 
-# apsrtable(fm1)
-# # 
-# (fm2 <- lmer(Reaction ~ Days + (1 | Subject), sleepstudy))
-# 
-# (fm3 <- lmer(Reaction ~ 0 + (1 | Subject) + (1 | Days), sleepstudy))
-# 
-# (fm3 <- lmer(Reaction ~ 0 + (1 | Subject) + (1 | Days), sleepstudy))
-# 
-# sleepstudy$Noise <- rnorm(nrow(sleepstudy))
-# sleepstudy$Wave <- sample(c("A", "B", "C"), nrow(sleepstudy), replace = TRUE)
-# 
-# 
-# (fm4 <- lmer(Reaction ~ 0 + (1 | Subject) + (Noise | Days) + (1|Wave), sleepstudy))
-# 
-# apsrtable(fm1, fm2, fm3, fm4)
-# 
-# apsrtable(fm1, fm2, fm3)
+(fm2 <- lmer(Reaction ~ Days + (1 | Subject), sleepstudy))
+
+(fm3 <- lmer(Reaction ~ 0 + (1 | Subject) + (1 | Days), sleepstudy))
+
+(fm3 <- lmer(Reaction ~ 0 + (1 | Subject) + (1 | Days), sleepstudy))
+
+sleepstudy$Noise <- rnorm(nrow(sleepstudy))
+sleepstudy$Wave <- sample(c("A", "B", "C"), nrow(sleepstudy), replace = TRUE)
+
+
+(fm4 <- lmer(Reaction ~ 0 + (1 | Subject) + (Noise | Days) + (1|Wave), sleepstudy))
+
+apsrtable(fm1, fm2, fm3, fm4)
+
+apsrtable(fm1, fm2, fm3)
 # 
 # 
 # sleepstudy$DV2 <- ifelse(sleepstudy$Reaction > 285, 1, 0)
