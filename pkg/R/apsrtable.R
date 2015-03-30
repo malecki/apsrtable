@@ -153,6 +153,8 @@
 ##' with respect to the tabular environment. (Not thoroughly tested with
 ##' alternative float environments, but should work with the standard
 ##' \code{table/tabular} combination.) Default=\code{"above"}
+##' @param size Character indicating the text size for use on the tabular environment. Use standard 
+##' LaTeX font sizes, default is \code{"normalsize"}.
 ##' @return A character vector containing lines of latex code. It can be
 ##' written out using \code{writeLines} for inclusion via \dQuote{\special{\input}} in
 ##' latex documents.
@@ -210,7 +212,10 @@ apsrtable <- function (...,
                        Sweave=FALSE, float="table",
                        Minionfig=FALSE,
                        label=NULL,caption=NULL,
-                       caption.position=c("above","below")
+                       caption.position=c("above","below"), 
+                       size=c("normalsize", "Huge","huge", "LARGE", "Large", "large", 
+                              "small", "footnotesize", 
+                              "scriptsize", "tiny")
                        ) {
     x <- list()
     myenv <- new.env()
@@ -232,6 +237,9 @@ apsrtable <- function (...,
                       digits)
     caption.position <- match.arg(caption.position,
                                   c("above","below"))
+    size <- match.arg(size, c("normalsize", "Huge","huge", "LARGE", "Large", "large", 
+                              "small", "footnotesize", 
+                              "scriptsize", "tiny"))
     models <- list(...)
     nmodels <- length(models)
 
@@ -273,7 +281,7 @@ apsrtable <- function (...,
                                                    "}\n\\label{",label,
                                                    "}",sep=""),
                                              ""),sep=""),
-                                "" ),
+                                "" ), paste0("\n\\begin{",size,"}\n"),
                          paste("\n\\begin{tabular}",colspec,sep=""))
     } else
     {
@@ -285,7 +293,7 @@ apsrtable <- function (...,
                                                      "}\n\\label{",label,
                                                      "}",sep=""),
                                                ""),sep=""),
-                                  "" ),
+                                  "" ), paste0("\n\\begin{",size,"}\n"),
                            paste("\n\\begin{tabular}",colspec,sep=""))
     }
     x <- paste(floatspec,
@@ -510,7 +518,7 @@ apsrtable <- function (...,
     } )
     x <- c(x, paste(notes, collapse="\\\\\n"))
 
-    if(!long) { x <- c(x,"\n\\end{tabular}") }
+    if(!long) { x <- c(x,"\n\\end{tabular}\n", paste0("\\end{",size,"}\n")) }
     if(long) { x <- c(x,"\n\\end{longtable}") }
     if(caption.position=="b") {
         x <- c(x, paste("\n\\caption{",caption,"}\n\\label{",label,"}",sep=""))
