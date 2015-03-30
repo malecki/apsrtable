@@ -282,7 +282,7 @@ apsrtable <- function (...,
                                                    "}",sep=""),
                                              ""),sep=""),
                                 "" ), paste0("\n\\begin{",size,"}\n"),
-                         paste("\n\\begin{tabular}",colspec,sep=""))
+                         paste("\\begin{tabular}",colspec,sep=""))
     } else
     {
         long <- FALSE
@@ -294,7 +294,7 @@ apsrtable <- function (...,
                                                      "}",sep=""),
                                                ""),sep=""),
                                   "" ), paste0("\n\\begin{",size,"}\n"),
-                           paste("\n\\begin{tabular}",colspec,sep=""))
+                           paste("\\begin{tabular}",colspec,sep=""))
     }
     x <- paste(floatspec,
                ifelse(long,"\\\\",""),
