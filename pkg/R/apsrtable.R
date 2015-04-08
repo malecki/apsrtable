@@ -271,7 +271,7 @@ apsrtable <- function (...,
                                   paste("\\caption{", caption,
                                         "}\n\\label{",label,"}",sep=""),
                                   ""),
-                           sep="")
+                           sep="", paste0("\n\\begin{",size,"}\n"))
     } else if(float == "sidewaystable"){
       long <- FALSE
       floatspec <- paste(ifelse(!Sweave,
@@ -519,7 +519,7 @@ apsrtable <- function (...,
     x <- c(x, paste(notes, collapse="\\\\\n"))
 
     if(!long) { x <- c(x,"\n\\end{tabular}\n", paste0("\\end{",size,"}\n")) }
-    if(long) { x <- c(x,"\n\\end{longtable}") }
+    if(long) { x <- c(x, "\n", paste0("\\end{",size,"}"), "\n\\end{longtable}") }
     if(caption.position=="b") {
         x <- c(x, paste("\n\\caption{",caption,"}\n\\label{",label,"}",sep=""))
     }
