@@ -112,6 +112,9 @@ setMethod("modelInfo", "summary.merMod", function(x) {
                                                collapse = " | ")
   }
   GroupList["Sigma"] <- formatC(as.numeric(attr(x$varcor, "sc"), digits = digits))
+  if(x$isLmer == FALSE){
+    GroupList["Sigma"] <- NULL
+  }
   model.info <- list(
                 "$N$"=formatC(as.numeric(x$devcomp$dims['n']),format="d"),
                 "AIC"=formatC(as.numeric(x$AICtab)[1],
