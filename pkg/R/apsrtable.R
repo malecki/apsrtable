@@ -153,6 +153,8 @@
 ##' with respect to the tabular environment. (Not thoroughly tested with
 ##' alternative float environments, but should work with the standard
 ##' \code{table/tabular} combination.) Default=\code{"above"}
+##' @param size Character indicating the text size for use on the tabular environment. Use standard 
+##' LaTeX font sizes, default is \code{"normalsize"}.
 ##' @return A character vector containing lines of latex code. It can be
 ##' written out using \code{writeLines} for inclusion via \dQuote{\special{\input}} in
 ##' latex documents.
@@ -210,7 +212,10 @@ apsrtable <- function (...,
                        Sweave=FALSE, float="table",
                        Minionfig=FALSE,
                        label=NULL,caption=NULL,
-                       caption.position=c("above","below")
+                       caption.position=c("above","below"), 
+                       size=c("normalsize", "Huge","huge", "LARGE", "Large", "large", 
+                              "small", "footnotesize", 
+                              "scriptsize", "tiny")
                        ) {
     x <- list()
     myenv <- new.env()
@@ -232,6 +237,9 @@ apsrtable <- function (...,
                       digits)
     caption.position <- match.arg(caption.position,
                                   c("above","below"))
+    size <- match.arg(size, c("normalsize", "Huge","huge", "LARGE", "Large", "large", 
+                              "small", "footnotesize", 
+                              "scriptsize", "tiny"))
     models <- list(...)
     nmodels <- length(models)
 
@@ -258,7 +266,8 @@ apsrtable <- function (...,
                      ,"}",collapse="")
     if(float=="longtable") {
         long <- TRUE
-        floatspec <- paste("\\begin{",float,"}",colspec,"\n",
+        floatspec <- paste(paste0("\\begin{",size,"}\n"), 
+                           "\\begin{",float,"}",colspec,"\n",
                            ifelse(caption.position=="above",
                                   paste("\\caption{", caption,
                                         "}\n\\label{",label,"}",sep=""),
@@ -273,8 +282,8 @@ apsrtable <- function (...,
                                                    "}\n\\label{",label,
                                                    "}",sep=""),
                                              ""),sep=""),
-                                "" ),
-                         paste("\n\\begin{tabular}",colspec,sep=""))
+                                "" ), paste0("\n\\begin{",size,"}\n"),
+                         paste("\\begin{tabular}",colspec,sep=""))
     } else
     {
         long <- FALSE
@@ -285,8 +294,8 @@ apsrtable <- function (...,
                                                      "}\n\\label{",label,
                                                      "}",sep=""),
                                                ""),sep=""),
-                                  "" ),
-                           paste("\n\\begin{tabular}",colspec,sep=""))
+                                  "" ), paste0("\n\\begin{",size,"}\n"),
+                           paste("\\begin{tabular}",colspec,sep=""))
     }
     x <- paste(floatspec,
                ifelse(long,"\\\\",""),
@@ -343,21 +352,27 @@ apsrtable <- function (...,
     } else {
         coefnames[incl] <- sanitize(coefnames[incl])
     }
-
+     "%w/o%" <- function(x, y) x[!x %in% y] #--  x without y
 
     out.table <- lapply(model.summaries, function(s){
         var.pos <- attr(s,"var.pos")
         model.out <- model.se.out <- star.out <- rep(NA,length(coefnames))
         model.out[var.pos] <- s$coefficients[,1]
-        if(lev>0) {
+        if(lev > 0) {
           if("t value" %in% colnames(s$coefficients)){
-            message("Using t-test with df = 100 to calculate stars.")
             nctmp <- ncol(s$coefficients)
-            s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
-            colnames(s$coefficients)[nctmp+1] <- "Pr(>|z|)"
-            star.out[var.pos] <- apsrStars(s$coefficients,
-                                           stars=stars,
-                                           lev=lev,signif.stars=TRUE)
+            if(nctmp == 4){
+              star.out[var.pos] <- apsrStars(s$coefficients,
+                                             stars=stars,
+                                             lev=lev,signif.stars=TRUE)
+            } else if(nctmp == 3){
+              message("Using t-test with df = 100 to calculate stars.")
+              s$coefficients <- cbind(s$coefficients, dt(s$coefficients[, nctmp], 100))
+              colnames(s$coefficients)[nctmp+1] <- "Pr(>|z|)"
+              star.out[var.pos] <- apsrStars(s$coefficients,
+                                             stars=stars,
+                                             lev=lev,signif.stars=TRUE)
+             }
           } else{
             star.out[var.pos] <- apsrStars(s$coefficients,
                                            stars=stars,
@@ -504,8 +519,8 @@ apsrtable <- function (...,
     } )
     x <- c(x, paste(notes, collapse="\\\\\n"))
 
-    if(!long) { x <- c(x,"\n\\end{tabular}") }
-    if(long) { x <- c(x,"\n\\end{longtable}") }
+    if(!long) { x <- c(x,"\n\\end{tabular}\n", paste0("\\end{",size,"}\n")) }
+    if(long) { x <- c(x, "\n\\end{longtable}", "\n", paste0("\\end{",size,"}")) }
     if(caption.position=="b") {
         x <- c(x, paste("\n\\caption{",caption,"}\n\\label{",label,"}",sep=""))
     }
