@@ -15,3 +15,11 @@ Description: Formats latex tables from one or more model objects side-by-side
 Encoding: UTF-8
 License: GPL (>= 2)
 LazyLoad: yes
+Collate:
+    'apsrtable.R'
+    'customSummaries.R'
+    'formatting.R'
+    'Internal.R'
+    'modelInfo.R'
+    'stars.R'
+    'apsrtable-package.R'
